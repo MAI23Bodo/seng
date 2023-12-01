@@ -1,7 +1,16 @@
+import UserContext from "@/context/user-context";
 import { Post } from "@/models/post";
-import { UserContext } from "@/models/user-context";
+import { useContext } from "react";
 
-export default function PostCard(props: {post: Post, userContext: UserContext}) {
+export default function PostCard(props: {post: Post}) {
+
+
+    const userContext = useContext(UserContext);
+
+    if (!userContext) return <p>No user context available</p>;
+
+    const { user } = userContext;
+
     return(
     <div className="card card-compact w-96 bg-base-100 shadow-xl mb-5 break-after-column post">
         <figure><img src={props.post.image ?? ''} alt="" /></figure>
@@ -9,7 +18,7 @@ export default function PostCard(props: {post: Post, userContext: UserContext}) 
             <h2 className="card-title">{props.post.user.username}</h2>
             <p>{props.post.text}</p>
             {
-                props.post.user.id === props.userContext.userId &&
+                props.post.user.id === user?.id &&
                 (<div className="card-actions justify-end">
                 <button className="btn btn-circle btn-outline btn-error">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
