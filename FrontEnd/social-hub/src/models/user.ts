@@ -1,5 +1,5 @@
 export class User {
-    constructor(id: number,
+constructor(id: number,
         username: string,
         userIconUrl: string | null,
         first_name: string | null,
