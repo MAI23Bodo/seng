@@ -16,7 +16,7 @@ from .models import User, Post
 # finish implementation of methods
 
 class LoginView(View):
-    def get(self, request):
+    def post(self, request):
         return JsonResponse("Login needs to be implemented.")
 
 class UsersView(View):
