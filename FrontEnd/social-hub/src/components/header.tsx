@@ -5,6 +5,7 @@ import RegisterModal from "./register-modal";
 import UserContext from "@/context/user-context";
 import { useContext } from "react";
 import React from "react";
+import PostModal from "./post-modal";
 
 export default function Header() {
 
@@ -24,6 +25,11 @@ export default function Header() {
     modal.showModal()
   }
 
+  const onOpenPostModal = () => {
+    let modal: any =  document.getElementById('post-modal');
+    modal.showModal()
+  }
+
   const [theme, setTheme] = React.useState('synthwave');
   const toggleTheme = () => {
     setTheme(theme === 'synthwave' ? 'cupcake' : 'synthwave');
@@ -37,6 +43,7 @@ export default function Header() {
     <div className="navbar bg-base-100">
       <LoginModal></LoginModal>
       <RegisterModal></RegisterModal>
+      <PostModal></PostModal>
       <div className="flex-1">
         <a className="btn btn-ghost text-xl">Social-Hub</a>
         <label className="swap swap-rotate">
@@ -46,6 +53,10 @@ export default function Header() {
         </label>
       </div>
       <div className="flex-none gap-2">
+        {
+          user != null &&
+          (<button className="btn btn-outline btn-primary" onClick={onOpenPostModal}>New Post</button>)
+        }
         <div className="form-control">
           <input type="text" placeholder="Search" className="input input-bordered w-24 md:w-auto" />
         </div>
