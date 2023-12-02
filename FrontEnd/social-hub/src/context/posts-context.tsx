@@ -1,7 +1,7 @@
 import { Post } from '@/models/post';
 import React from 'react';
 
-const PostsContext = React.createContext<PostsContextType>({posts: []});
+const PostsContext = React.createContext<PostsContextType | null>(null);
 
 export default PostsContext;
 

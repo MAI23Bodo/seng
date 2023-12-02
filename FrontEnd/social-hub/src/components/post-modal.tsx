@@ -1,3 +1,4 @@
+import PostsContext from "@/context/posts-context";
 import UserContext from "@/context/user-context";
 import { useContext, useEffect, useState } from "react";
 
@@ -5,20 +6,40 @@ export default function PostModal() {
 
     const [text, setText] = useState('');
     const [errorMessage, setErrorMessage] = useState('')
+    const [image, setImage] = useState<File | null>(null);
 
-    const userContext = useContext(UserContext);
+    const postsContext = useContext(PostsContext);
+    const userContext = useContext(UserContext) 
 
+    if (!postsContext) return <p>No posts context available</p>;
     if (!userContext) return <p>No user context available</p>;
 
+    const { createPost } = postsContext;
     const { user } = userContext;
 
     const formValidation = () => {
+        if (!text) {
+            return 'post requires a message'
+        }
+        if (!image) {
+            return 'post requires an image'
+        }
       return '';
     }
 
     const onSubmit = () => {
+        createPost({
+            id: null, user: user!, text: text, image: null,
+            timestamp: Date.now().toString()
+        })
         let modal: any =  document.getElementById('post-modal');
         modal!.close()
+    }
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            setImage(e.target.files[0]);
+          }
     }
 
     useEffect(() => {
@@ -45,7 +66,7 @@ export default function PostModal() {
                 <form method="post">
                     <div className="form-control w-full max">
                         <label className="label">
-                            <span className="label-text">Text</span>
+                            <span className="label-text">Message</span>
                         </label>
                         <input
                             type="text"
@@ -59,7 +80,9 @@ export default function PostModal() {
                         <label className="label">
                             <span className="label-text">Image</span>
                         </label>
-                        <input type="file" className="file-input file-input-bordered file-input-primary w-full max-w-xs" />
+                        <input type="file"
+                            className="file-input file-input-bordered file-input-primary w-full max-w-xs"
+                            onChange={handleFileChange}/>
                     </div>
                     <button className="btn  btn-primary mt-2" type="button" onClick={onSubmit} disabled = {errorMessage !== ''}>Submit</button>
                 </form>

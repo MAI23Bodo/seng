@@ -1,15 +1,27 @@
-import { Post } from "@/models/post";
-import PostCard from "./post-card";
+import { useContext, useEffect, useState } from "react"
+import {Post} from '../models/post';
+import PostColumns from "./post-columns";
+import PostsContext from "@/context/posts-context";
 
-export default function Dashboard(props: {posts: Post[]}) {
-  return(
-    <div className="columns-3 ">
-      {
-        
-        props.posts.map((p) => {
-          return (<PostCard post={p} key={p.id}></PostCard>)
-        })
-      }
-    </div>
-  )
+interface DashboardProps {
+    mode: string
+}
+
+export default function Dashboard(props: DashboardProps) {
+    const [displayPosts, setDisplayPosts] = useState<Post[]>([])
+    const postsContext = useContext(PostsContext);
+    if (!postsContext) return <p>No posts context available</p>;
+    
+    useEffect(() => {
+        switch(props.mode) {
+            case 'all_posts':
+                setDisplayPosts(postsContext.posts)
+            break
+        }
+    })
+    
+
+    return(
+        <PostColumns posts={displayPosts}></PostColumns>
+    )
 }
