@@ -26,7 +26,6 @@ export default function LoginModal() {
         else {
             setErrorMessage('invalid username or password')
         }
-        
     }
 
     const formValidation = () => {
