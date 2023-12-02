@@ -1,27 +1,30 @@
 import { useContext, useEffect, useState } from "react"
-import {Post} from '../models/post';
 import PostColumns from "./post-columns";
 import PostsContext from "@/context/posts-context";
+import Header from "./header";
 
-interface DashboardProps {
-    mode: string
-}
-
-export default function Dashboard(props: DashboardProps) {
-    const [displayPosts, setDisplayPosts] = useState<Post[]>([])
+export default function Dashboard() {
+    const [filterId, setFilterId] = useState(0);
     const postsContext = useContext(PostsContext);
     if (!postsContext) return <p>No posts context available</p>;
     
-    useEffect(() => {
-        switch(props.mode) {
-            case 'all_posts':
-                setDisplayPosts(postsContext.posts)
-            break
+    const getDisplayPosts = () => {
+        if (filterId === 0) {
+            return postsContext.posts
         }
-    })
+        return postsContext.posts.filter(p => p.user.id === filterId);
+    }
     
+    const viewFrom = (id: number) => {
+        setFilterId(id)
+    }
 
     return(
-        <PostColumns posts={displayPosts}></PostColumns>
+        <div>
+            <Header viewFrom={viewFrom}></Header>
+            <main className="flex min-h-screen flex-col items-center justify-between p-24">
+                <PostColumns posts={getDisplayPosts()} viewFrom={viewFrom}></PostColumns>
+            </main>
+        </div>
     )
 }
