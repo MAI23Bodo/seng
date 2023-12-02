@@ -1,17 +1,16 @@
+"use client";
+
 import Dashboard from '@/components/dashboard'
 import Header from '@/components/header'
+import UserProvider from '@/context/user-provider';
 import { Post } from '@/models/post'
 import { User } from '@/models/user'
-import { UserContext } from '@/models/user-context';
 
 export default function Home() {
   let img1 = "https://plus.unsplash.com/premium_photo-1668376545856-ad0314a8479e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fHBhcnR5fGVufDB8fDB8fHww";
   let img2 = "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
   let img3 = "https://images.unsplash.com/photo-1566737236500-c8ac43014a67?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
   
-  let userContext: UserContext = {
-    userId: 0
-  }
   let currentUser: User = {
     userIconUrl: '',
     username: 'Clemens',
@@ -20,6 +19,8 @@ export default function Home() {
     last_name: 'Wondrak',
     email: 'ai23m032@fh-technikum.at'
   }
+
+
   let otherUser = {
     userIconUrl: '',
     username: 'Max',
@@ -35,12 +36,15 @@ export default function Home() {
     {id: 3, image: null, text: 'Only Text Post', timestamp: new Date().toDateString(), user: currentUser},
   ];
 
+
   return (
     <div>
-      <Header {...currentUser}></Header>
-      <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <Dashboard posts={posts} userContext={userContext}></Dashboard>
-    </main>
+      <UserProvider>
+        <Header></Header>
+        <main className="flex min-h-screen flex-col items-center justify-between p-24">
+        <Dashboard posts={posts}></Dashboard>      
+        </main>
+      </UserProvider>
     </div>
   )
 }
