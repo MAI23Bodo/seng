@@ -11,10 +11,7 @@ export default function Home() {
     <div>
       <UserProvider>
         <PostsProvider>
-          <Header></Header>
-          <main className="flex min-h-screen flex-col items-center justify-between p-24">
-            <Dashboard mode={'all_posts'}></Dashboard>      
-          </main>
+          <Dashboard></Dashboard>
         </PostsProvider>
       </UserProvider>
     </div>
