@@ -81,10 +81,14 @@ DATABASES = {
     }
 }
 
+# Authentication
+LOGIN_REDIRECT_URL = '/posts/' # URL to redirect to after login
+LOGIN_URL = '' # URL to redirect to if login_required() gets called
+LOGOUT_REDIRECT_URL = '' # URL to redirect to after logout
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
-
+''' too much pain in the ass so not used for sweg
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -99,7 +103,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
+'''
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
