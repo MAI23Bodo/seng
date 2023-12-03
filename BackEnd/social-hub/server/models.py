@@ -9,6 +9,6 @@ class User(models.Model):
 
 class Post(models.Model):
     post_id = models.IntegerField(primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE) # TODO: user: { id  + username }
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.TextField()
-    #image = models.ImageField(upload_to='post_images') # TODO: image = url
+    image = models.URLField(null=True, blank=True)
