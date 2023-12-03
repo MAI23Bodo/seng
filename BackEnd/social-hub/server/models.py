@@ -11,4 +11,6 @@ class Post(models.Model):
     post_id = models.IntegerField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.TextField()
-    image = models.URLField(null=True, blank=True)
+    image = models.URLField(null=True)
+    posted_on = models.DateTimeField(null=True)
+    updated_on = models.DateTimeField(null=True)

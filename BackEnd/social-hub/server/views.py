@@ -6,13 +6,14 @@ from django.contrib.auth.models import User, auth #allows us to authenticate the
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.core.serializers import serialize
+from django.utils import timezone
 from django.shortcuts import get_object_or_404, get_list_or_404, redirect
 import json
 
 from .models import User, Post
 
 # TODO:
-# login/logout + signup?
+# authentification (LoginView) + csrf
 # image endpoint/view
 
 # /login - post
@@ -127,6 +128,8 @@ class PostsView(View):
         post_id = request.GET.get('post_id')
         user_id = request.GET.get('user_id')
         text = request.GET.get('text')
+        posted_from = request.GET.get('posted_from')
+        posted_to = request.GET.get('posted_to')
 
         # Create a dictionary to store filter conditions and filter
         filter_conditions = {}
@@ -136,7 +139,11 @@ class PostsView(View):
             filter_conditions['user_id'] = user_id
         if text:
             filter_conditions['text'] = text
-        
+        if posted_from:
+            filter_conditions['posted_on__gte'] = posted_from
+        if posted_to:
+            filter_conditions['posted_on__lte'] = posted_to
+
         posts = get_list_or_404(Post, **filter_conditions)
         serialized_posts = serialize('json', posts)
         return JsonResponse({"posts": serialized_posts})
@@ -146,7 +153,8 @@ class PostsView(View):
     def post(self, request):
         post = Post.objects.create(
             user_id=request.POST.get('user_id'),
-            text=request.POST.get('text')
+            text=request.POST.get('text'),
+            posted_on = timezone.now()
         )
         return JsonResponse({"post_id": post.post_id})
 
@@ -168,6 +176,7 @@ class PostDetailView(View):
         if "text" in data:
             post.text = data["text"]
         
+        post.updated_on = timezone.now()
         post.save()
         return JsonResponse({"message": "Post updated successfully"})
     
@@ -181,6 +190,7 @@ class PostDetailView(View):
         # does not make sense to update user or post id! -> image is handled in the image endpoint
         post.text = data.get("text", post.text)
 
+        post.updated_on = timezone.now()
         post.save()
         return JsonResponse({"message": "Post updated successfully"})
 
