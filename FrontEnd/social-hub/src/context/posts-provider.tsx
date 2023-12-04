@@ -16,7 +16,7 @@ const PostsProvider: React.FC<PostsProviderProps> = ({ children }) => {
     let currentUser: User = {
       userIconUrl: '',
       username: 'Clemens',
-      id: 0,
+      id: 1,
       first_name: 'Clemens',
       last_name: 'Wondrak',
       email: 'ai23m032@fh-technikum.at'
@@ -26,7 +26,7 @@ const PostsProvider: React.FC<PostsProviderProps> = ({ children }) => {
     let otherUser = {
       userIconUrl: '',
       username: 'Max',
-      id: 1,
+      id: 2,
       first_name: 'Max',
       last_name: 'Mustermann',
       email: 'max@mustermail.at'

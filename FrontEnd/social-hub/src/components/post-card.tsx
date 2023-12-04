@@ -2,7 +2,12 @@ import UserContext from "@/context/user-context";
 import { Post } from "@/models/post";
 import { useContext } from "react";
 
-export default function PostCard(props: {post: Post}) {
+interface PostCardProps {
+    post: Post;
+    viewFrom: (userId: number) => void;
+}
+
+export default function PostCard(props: PostCardProps) {
 
 
     const userContext = useContext(UserContext);
@@ -15,7 +20,7 @@ export default function PostCard(props: {post: Post}) {
     <div className="card card-compact w-96 bg-base-100 shadow-xl mb-5 break-after-column post">
         <figure><img src={props.post.image ?? ''} alt="" /></figure>
         <div className="card-body">
-            <h2 className="card-title">{props.post.user.username}</h2>
+            <h2 className="card-title"><button onClick={() => {props.viewFrom(props.post.user.id)}}><u>{props.post.user.username}</u></button></h2>
             <p>{props.post.text}</p>
             {
                 props.post.user.id === user?.id &&
