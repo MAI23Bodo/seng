@@ -37,7 +37,6 @@ class LogoutView(View):
         logout(request)
         return JsonResponse({"success": "Logged out successfully"})
 
-
 # /users - get + post
 class UsersView(View):
     # @method_decorator(login_required())
@@ -70,28 +69,24 @@ class UsersView(View):
         user = User.objects.create_user(
             username=request.POST.get('username'),
             email=request.POST.get('email'),
-            password=request.POST.get('password'),
             first_name=request.POST.get('first_name'),
             last_name=request.POST.get('last_name')
         )
+        user.set_password(request.POST.get('password'))
         user.save()
         return JsonResponse(UserSerializer(user).data, safe=False)
 
-# /users/<user_id> - get + patch + put + delete
+# /users/<id> - get + patch + put + delete
 class UserDetailView(View):
     # @method_decorator(login_required())
-    def get(self, request, user_id):
-
-        # TODO: check how to retrieve a User from django.contrib.auth.models import User
-        user = get_object_or_404(User, pk=user_id)
-        serialized_user = serialize('json', [user])
-        return JsonResponse({"user": serialized_user})
+    def get(self, request, id):
+        user = User.objects.get(pk=id)
+        return JsonResponse(UserSerializer(user).data, safe=False)
 
     @method_decorator(csrf_exempt)
     @method_decorator(login_required())
-    def patch(self, request, user_id):
-        # TODO: check how to retrieve a User from django.contrib.auth.models import User
-        user = get_object_or_404(User, pk=user_id)
+    def patch(self, request, id):
+        user = User.objects.get(pk=id)
         data = json.loads(request.body)
 
         # TODO: optionally update password
@@ -110,7 +105,7 @@ class UserDetailView(View):
 
     @method_decorator(csrf_exempt)
     @method_decorator(login_required())
-    def put(self, request, user_id):
+    def put(self, request, id):
         # TODO: check how to retrieve a User from django.contrib.auth.models import User
         user = get_object_or_404(User, pk=user_id)
         data = json.loads(request.body)
@@ -126,7 +121,7 @@ class UserDetailView(View):
         return JsonResponse({"message": "User updated successfully"})
 
     @method_decorator(login_required())
-    def delete(self, request, user_id):
+    def delete(self, request, id):
         # TODO: check how to retrieve and delete a User from django.contrib.auth.models import User
         user = get_object_or_404(User, pk=user_id)
         user.delete()
@@ -173,19 +168,17 @@ class PostsView(View):
         post.save()
         return JsonResponse({"post_id": post.post_id})
 
-# /posts/<post_id> - get + patch + put + delete
-
-
+# /posts/<id> - get + patch + put + delete
 class PostDetailView(View):
     @method_decorator(login_required())
-    def get(self, request, post_id):
+    def get(self, request, id):
         post = get_object_or_404(Post, pk=post_id)
         serialized_post = serialize('json', [post])
         return JsonResponse({"post": serialized_post})
 
     @method_decorator(csrf_exempt)
     @method_decorator(login_required())
-    def patch(self, request, post_id):
+    def patch(self, request, id):
         post = get_object_or_404(Post, pk=post_id)
         data = json.loads(request.body)
 
@@ -199,7 +192,7 @@ class PostDetailView(View):
 
     @method_decorator(csrf_exempt)
     @method_decorator(login_required())
-    def put(self, request, post_id):
+    def put(self, request, id):
         post = get_object_or_404(Post, pk=post_id)
         data = json.loads(request.body)
 
@@ -212,7 +205,7 @@ class PostDetailView(View):
         return JsonResponse({"message": "Post updated successfully"})
 
     @method_decorator(login_required())
-    def delete(self, request, post_id):
+    def delete(self, request, id):
         post = get_object_or_404(Post, pk=post_id)
         post.delete()
         return JsonResponse({"message": "Post deleted successfully"})
