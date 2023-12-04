@@ -1,10 +1,11 @@
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.views import View
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.core.serializers import serialize
+from server.serializers import UserSerializer, PostSerializer
 from django.utils import timezone
 from django.shortcuts import get_object_or_404, get_list_or_404
 import json
@@ -15,8 +16,6 @@ from .models import Post
 # TODO: image endpoint/view
 
 # / - post
-
-
 class LoginView(View):
     @method_decorator(csrf_exempt)
     def post(self, request):
@@ -26,54 +25,45 @@ class LoginView(View):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return JsonResponse({"message": "Logged in successfully"})
+            return JsonResponse({"success": "Logged in successfully"})
         else:
             return JsonResponse({"error": "Invalid credentials"})
 
 # /logout - post
-
-
 class LogoutView(View):
     @method_decorator(csrf_exempt)
     @method_decorator(login_required())
     def post(self, request):
         logout(request)
-        return JsonResponse({"message": "Logged out successfully"})
+        return JsonResponse({"success": "Logged out successfully"})
 
 
 # /users - get + post
 class UsersView(View):
     # @method_decorator(login_required())
     def get(self, request):
-
         # Get filter parameters from the request
-        user_id = request.GET.get('user_id')
+        id = request.GET.get('id')
         username = request.GET.get('username')
         first_name = request.GET.get('first_name')
         last_name = request.GET.get('last_name')
         email = request.GET.get('email')
 
-        # Create a dictionary to store filter conditions and filter
-        filter_conditions = {}
-        if user_id:
-            filter_conditions['user_id'] = user_id
+        # Create a dictionary to store filter parameters
+        filter_params = {}
+        if id:
+            filter_params['id'] = id
         if username:
-            filter_conditions['username'] = username
+            filter_params['username'] = username
         if first_name:
-            filter_conditions['first_name'] = first_name
+            filter_params['first_name'] = first_name
         if last_name:
-            filter_conditions['last_name'] = last_name
+            filter_params['last_name'] = last_name
         if email:
-            filter_conditions['email'] = email
+            filter_params['email'] = email
 
-        # TODO: check how to retrieve a list of Users from django.contrib.auth.models import User
-        # users = User.objects.get(**filter_conditions) ?
-        # users = get_list_or_404(User, **filter_conditions)
-        users = User.objects.all()
-        users.
-        serialized_users = serialize(
-            'json', User.objects.filter(**filter_conditions))
-        return JsonResponse({"users": serialized_users})
+        serialized_users = UserSerializer(User.objects.filter(**filter_params), many=True)
+        return JsonResponse(serialized_users.data, safe=False)
 
     @method_decorator(csrf_exempt)
     def post(self, request):
@@ -85,11 +75,9 @@ class UsersView(View):
             last_name=request.POST.get('last_name')
         )
         user.save()
-        return JsonResponse({"username": user.username})
+        return JsonResponse(UserSerializer(user).data, safe=False)
 
 # /users/<user_id> - get + patch + put + delete
-
-
 class UserDetailView(View):
     # @method_decorator(login_required())
     def get(self, request, user_id):
