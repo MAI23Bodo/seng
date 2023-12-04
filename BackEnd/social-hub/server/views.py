@@ -89,7 +89,6 @@ class UserDetailView(View):
         user = User.objects.get(pk=id)
         data = json.loads(request.body)
 
-        # TODO: optionally update password
         # set new values
         if "username" in data:
             user.username = data["username"]
@@ -99,31 +98,31 @@ class UserDetailView(View):
             user.last_name = data["last_name"]
         if "email" in data:
             user.email = data["email"]
+        if "password" in data:
+            user.set_password(data["password"])
 
         user.save()
-        return JsonResponse({"message": "User updated successfully"})
+        return JsonResponse(UserSerializer(user).data, safe=False)
 
     @method_decorator(csrf_exempt)
     #@method_decorator(login_required())
     def put(self, request, id):
-        # TODO: check how to retrieve a User from django.contrib.auth.models import User
-        user = get_object_or_404(User, pk=user_id)
+        user = User.objects.get(pk=id)
         data = json.loads(request.body)
 
-        # TODO: update password
         # update all fields based on the incoming JSON data
         user.username = data.get("username", user.username)
         user.first_name = data.get("first_name", user.first_name)
         user.last_name = data.get("last_name", user.last_name)
         user.email = data.get("email", user.email)
+        user.set_password(data.get("password"))
 
         user.save()
-        return JsonResponse({"message": "User updated successfully"})
+        return JsonResponse(UserSerializer(user).data, safe=False)
 
     #@method_decorator(login_required())
     def delete(self, request, id):
-        # TODO: check how to retrieve and delete a User from django.contrib.auth.models import User
-        user = get_object_or_404(User, pk=user_id)
+        user = User.objects.get(pk=id)
         user.delete()
         return JsonResponse({"success": "User deleted successfully"})
 
@@ -169,14 +168,13 @@ class PostsView(View):
 class PostDetailView(View):
     #@method_decorator(login_required())
     def get(self, request, id):
-        post = get_object_or_404(Post, pk=id)
-        serialized_post = serialize('json', [post])
-        return JsonResponse({"post": serialized_post})
+        post = Post.objects.get(pk=id)
+        return JsonResponse(PostSerializer(post).data, safe=False)
 
     @method_decorator(csrf_exempt)
     #@method_decorator(login_required())
     def patch(self, request, id):
-        post = get_object_or_404(Post, pk=post_id)
+        post = Post.objects.get(pk=id)
         data = json.loads(request.body)
 
         # does not make sense to update user or post id! -> image is handled in the image endpoint
@@ -185,24 +183,24 @@ class PostDetailView(View):
 
         post.updated_on = timezone.now()
         post.save()
-        return JsonResponse({"message": "Post updated successfully"})
+        return JsonResponse(PostSerializer(post).data, safe=False)
 
     @method_decorator(csrf_exempt)
     #@method_decorator(login_required())
     def put(self, request, id):
-        post = get_object_or_404(Post, pk=post_id)
+        post = Post.objects.get(pk=id)
         data = json.loads(request.body)
 
         # update all fields based on the incoming JSON data
         # does not make sense to update user or post id! -> image is handled in the image endpoint
         post.text = data.get("text", post.text)
-
         post.updated_on = timezone.now()
+
         post.save()
-        return JsonResponse({"message": "Post updated successfully"})
+        return JsonResponse(PostSerializer(post).data, safe=False)
 
     #@method_decorator(login_required())
     def delete(self, request, id):
-        post = get_object_or_404(Post, pk=post_id)
+        post = Post.objects.get(pk=id)
         post.delete()
-        return JsonResponse({"message": "Post deleted successfully"})
+        return JsonResponse({"success": "Post deleted successfully"})
