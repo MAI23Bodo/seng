@@ -1,31 +1,10 @@
-from django.test import TestCase, Client, RequestFactory
+from django.test import TestCase, Client
 from rest_framework import status
 from django.utils import timezone
 import json
 from django.contrib.auth.models import User
 
 
-class testWorkflow(TestCase):
-    def setUp(self):
-        self.factory = RequestFactory()
-
-    def test_post_get(self):
-
-        self.client = Client()
-        response = self.client.post("/users/", {"username": "abracadaniel",
-                                                "password": "1234",
-                                                "email": "testuser@social_hub.at",
-                                                "first_name": "test",
-                                                "last_name": "user"})
-
-        print(f"POST-RESPONSE: {response.content}")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.content, b'{"username": "abracadaniel"}')
-        response = self.client.get("/users/")
-        print(f"GET-RESPONSE: {response.content}")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-'''
 class TestSocialHub(TestCase):
 
     client = Client()
@@ -125,4 +104,3 @@ class TestSocialHub(TestCase):
         # Delete User
         response = self.client.delete(f"/users/?id={self.user_id}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-'''
