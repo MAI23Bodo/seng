@@ -23,4 +23,5 @@ jobs:
         pip install --upgrade django djangorestframework
     - name: Run Tests
       run: |
+        cd ./BackEnd/social-hub
         python manage.py test
