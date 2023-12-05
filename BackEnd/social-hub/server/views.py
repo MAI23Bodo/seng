@@ -69,8 +69,6 @@ class UsersView(View):
         # TODO: check how to retrieve a list of Users from django.contrib.auth.models import User
         # users = User.objects.get(**filter_conditions) ?
         # users = get_list_or_404(User, **filter_conditions)
-        users = User.objects.all()
-        users.
         serialized_users = serialize(
             'json', User.objects.filter(**filter_conditions))
         return JsonResponse({"users": serialized_users})
