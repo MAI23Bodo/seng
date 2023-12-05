@@ -1,14 +1,11 @@
 from django.db import models
+from django.contrib.auth import get_user_model
+import uuid #helps us generate unique IDs for the posts
 
-class User(models.Model):
-    user_id = models.IntegerField(primary_key=True)
-    username = models.CharField(max_length=100)
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    email = models.EmailField(unique=True)
+User = get_user_model()
 
 class Post(models.Model):
-    post_id = models.IntegerField(primary_key=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.TextField()
     image = models.URLField(null=True)

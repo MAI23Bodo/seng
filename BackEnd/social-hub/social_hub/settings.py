@@ -30,6 +30,7 @@ DEBUG = True
 
 INSTALLED_APPS = [
     'server.apps.ServerConfig',
+    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -98,10 +99,31 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
 ]
 
 
+CORS_ALLOW_HEADERS = ['*']
+ALLOWED_HOSTS=['*']
+CORS_ORIGIN_ALLOW_ALL = True
+
+
+
+
+
+CORS_ALLOW_ALL_ORIGINS = True # If this is used then `CORS_ALLOWED_ORIGINS` will not have any effect
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+] # If this is used, then not need to use `CORS_ALLOW_ALL_ORIGINS = True`
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    'http://localhost:3000',
+]
+
+
+# Authentication
+LOGIN_REDIRECT_URL = '/posts/' # URL to redirect to after login
+LOGIN_URL = '' # URL to redirect to if login_required() gets called
+LOGOUT_REDIRECT_URL = '' # URL to redirect to after logout
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
-
+''' too much pain in the ass so not used for sweg
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -116,7 +138,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
+'''
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
