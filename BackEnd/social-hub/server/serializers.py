@@ -8,7 +8,24 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'username', 'first_name', 'last_name', 'email')
     
-class PostSerializer(serializers.Serializer):
+class PostSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+
+    class Meta:
+        model = Post
+        fields = ('id', 'user', 'text', 'image', 'posted_on')
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        user_representation = representation.pop('user')
+        return {
+            'id': representation['id'],
+            'user': {'id': user_representation['id']},
+            'text': representation['text'],
+            'image': representation['image'],
+            'posted_on': representation['posted_on'],
+        }
+'''
     #TODO:
     id = serializers.IntegerField(read_only=True)
     title = serializers.CharField(required=False, allow_blank=True, max_length=100)
@@ -33,3 +50,4 @@ class PostSerializer(serializers.Serializer):
         instance.style = validated_data.get('style', instance.style)
         instance.save()
         return instance
+'''

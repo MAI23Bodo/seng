@@ -13,7 +13,7 @@ import json
 from django.contrib.auth.models import User
 from .models import Post
 
-# TODO: image endpoint/view
+# TODO: image endpoint/view + activate login_required
 
 # / - post
 class LoginView(View):
@@ -36,7 +36,6 @@ class LogoutView(View):
     def post(self, request):
         logout(request)
         return JsonResponse({"success": "Logged out successfully"})
-
 
 # /users - get + post
 class UsersView(View):
@@ -74,31 +73,26 @@ class UsersView(View):
         user = User.objects.create_user(
             username=request.POST.get('username'),
             email=request.POST.get('email'),
-            password=request.POST.get('password'),
             first_name=request.POST.get('first_name'),
             last_name=request.POST.get('last_name')
         )
+        user.set_password(request.POST.get('password'))
         user.save()
         return JsonResponse(UserSerializer(user).data, safe=False)
 
-# /users/<user_id> - get + patch + put + delete
+# /users/<id> - get + patch + put + delete
 class UserDetailView(View):
     # @method_decorator(login_required())
-    def get(self, request, user_id):
-
-        # TODO: check how to retrieve a User from django.contrib.auth.models import User
-        user = get_object_or_404(User, pk=user_id)
-        serialized_user = serialize('json', [user])
-        return JsonResponse({"user": serialized_user})
+    def get(self, request, id):
+        user = User.objects.get(pk=id)
+        return JsonResponse(UserSerializer(user).data, safe=False)
 
     @method_decorator(csrf_exempt)
-    @method_decorator(login_required())
-    def patch(self, request, user_id):
-        # TODO: check how to retrieve a User from django.contrib.auth.models import User
-        user = get_object_or_404(User, pk=user_id)
+    #@method_decorator(login_required())
+    def patch(self, request, id):
+        user = User.objects.get(pk=id)
         data = json.loads(request.body)
 
-        # TODO: optionally update password
         # set new values
         if "username" in data:
             user.username = data["username"]
@@ -108,89 +102,83 @@ class UserDetailView(View):
             user.last_name = data["last_name"]
         if "email" in data:
             user.email = data["email"]
+        if "password" in data:
+            user.set_password(data["password"])
 
         user.save()
-        return JsonResponse({"message": "User updated successfully"})
+        return JsonResponse(UserSerializer(user).data, safe=False)
 
     @method_decorator(csrf_exempt)
-    @method_decorator(login_required())
-    def put(self, request, user_id):
-        # TODO: check how to retrieve a User from django.contrib.auth.models import User
-        user = get_object_or_404(User, pk=user_id)
+    #@method_decorator(login_required())
+    def put(self, request, id):
+        user = User.objects.get(pk=id)
         data = json.loads(request.body)
 
-        # TODO: update password
         # update all fields based on the incoming JSON data
         user.username = data.get("username", user.username)
         user.first_name = data.get("first_name", user.first_name)
         user.last_name = data.get("last_name", user.last_name)
         user.email = data.get("email", user.email)
+        user.set_password(data.get("password"))
 
         user.save()
-        return JsonResponse({"message": "User updated successfully"})
+        return JsonResponse(UserSerializer(user).data, safe=False)
 
-    @method_decorator(login_required())
-    def delete(self, request, user_id):
-        # TODO: check how to retrieve and delete a User from django.contrib.auth.models import User
-        user = get_object_or_404(User, pk=user_id)
+    #@method_decorator(login_required())
+    def delete(self, request, id):
+        user = User.objects.get(pk=id)
         user.delete()
-        return JsonResponse({"message": "User deleted successfully"})
+        return JsonResponse({"success": "User deleted successfully"})
 
 # /posts - get + post
-
-
 class PostsView(View):
-    @method_decorator(login_required())
+    #@method_decorator(login_required())
     def get(self, request):
         # Get filter parameters from the request
-        post_id = request.GET.get('post_id')
-        user_id = request.GET.get('user_id')
+        id = request.GET.get('id')
+        user_id = request.GET.get('user.id')
         text = request.GET.get('text')
         posted_from = request.GET.get('posted_from')
         posted_to = request.GET.get('posted_to')
 
-        # Create a dictionary to store filter conditions and filter
-        filter_conditions = {}
-        if post_id:
-            filter_conditions['post_id'] = post_id
+        # Create a dictionary to store filter parameters and filter
+        filter_params = {}
+        if id:
+            filter_params['id'] = id
         if user_id:
-            filter_conditions['user_id'] = user_id
+            filter_params['user__id'] = user_id
         if text:
-            filter_conditions['text'] = text
+            filter_params['text'] = text
         if posted_from:
-            filter_conditions['posted_on__gte'] = posted_from
+            filter_params['posted_on__gte'] = posted_from
         if posted_to:
-            filter_conditions['posted_on__lte'] = posted_to
+            filter_params['posted_on__lte'] = posted_to
 
-        posts = get_list_or_404(Post, **filter_conditions)
-        serialized_posts = serialize('json', posts)
-        return JsonResponse({"posts": serialized_posts})
-
+        serialized_posts = PostSerializer(Post.objects.filter(**filter_params), many=True)
+        return JsonResponse(serialized_posts.data, safe=False)
+    
     @method_decorator(csrf_exempt)
-    @method_decorator(login_required())
+    #@method_decorator(login_required())
     def post(self, request):
         post = Post.objects.create(
-            user_id=request.POST.get('user_id'),
+            user_id=request.POST.get('user.id'),
             text=request.POST.get('text'),
             posted_on=timezone.now()
         )
         post.save()
-        return JsonResponse({"post_id": post.post_id})
+        return JsonResponse(PostSerializer(post).data, safe=False)
 
-# /posts/<post_id> - get + patch + put + delete
-
-
+# /posts/<id> - get + patch + put + delete
 class PostDetailView(View):
-    @method_decorator(login_required())
-    def get(self, request, post_id):
-        post = get_object_or_404(Post, pk=post_id)
-        serialized_post = serialize('json', [post])
-        return JsonResponse({"post": serialized_post})
+    #@method_decorator(login_required())
+    def get(self, request, id):
+        post = Post.objects.get(pk=id)
+        return JsonResponse(PostSerializer(post).data, safe=False)
 
     @method_decorator(csrf_exempt)
-    @method_decorator(login_required())
-    def patch(self, request, post_id):
-        post = get_object_or_404(Post, pk=post_id)
+    #@method_decorator(login_required())
+    def patch(self, request, id):
+        post = Post.objects.get(pk=id)
         data = json.loads(request.body)
 
         # does not make sense to update user or post id! -> image is handled in the image endpoint
@@ -199,24 +187,24 @@ class PostDetailView(View):
 
         post.updated_on = timezone.now()
         post.save()
-        return JsonResponse({"message": "Post updated successfully"})
+        return JsonResponse(PostSerializer(post).data, safe=False)
 
     @method_decorator(csrf_exempt)
-    @method_decorator(login_required())
-    def put(self, request, post_id):
-        post = get_object_or_404(Post, pk=post_id)
+    #@method_decorator(login_required())
+    def put(self, request, id):
+        post = Post.objects.get(pk=id)
         data = json.loads(request.body)
 
         # update all fields based on the incoming JSON data
         # does not make sense to update user or post id! -> image is handled in the image endpoint
         post.text = data.get("text", post.text)
-
         post.updated_on = timezone.now()
-        post.save()
-        return JsonResponse({"message": "Post updated successfully"})
 
-    @method_decorator(login_required())
-    def delete(self, request, post_id):
-        post = get_object_or_404(Post, pk=post_id)
+        post.save()
+        return JsonResponse(PostSerializer(post).data, safe=False)
+
+    #@method_decorator(login_required())
+    def delete(self, request, id):
+        post = Post.objects.get(pk=id)
         post.delete()
-        return JsonResponse({"message": "Post deleted successfully"})
+        return JsonResponse({"success": "Post deleted successfully"})
