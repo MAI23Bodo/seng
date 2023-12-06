@@ -1,3 +1,4 @@
+import { Credentials } from '@/models/credentials';
 import { User } from '@/models/user';
 import React from 'react';
 
@@ -7,6 +8,7 @@ export default UserContext;
 
 export interface UserContextType {
     user: User | null;
-    login: (userName: string) => void;
+    register: (user: User) => Promise<boolean>;
+    login: (credentials: Credentials) => Promise<boolean>;
     logout: () => void;
 }

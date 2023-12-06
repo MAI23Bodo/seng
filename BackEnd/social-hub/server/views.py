@@ -25,7 +25,7 @@ class LoginView(View):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return JsonResponse({"success": "Logged in successfully"})
+            return JsonResponse({"userId": user.id})
         else:
             return JsonResponse({"error": "Invalid credentials"})
 
@@ -156,6 +156,8 @@ class PostsView(View):
     @method_decorator(csrf_exempt)
     #@method_decorator(login_required())
     def post(self, request):
+        user = request.POST.get('user')
+        print(user)
         post = Post.objects.create(
             user_id=request.POST.get('user.id'),
             text=request.POST.get('text'),

@@ -20,7 +20,7 @@ class PostSerializer(serializers.ModelSerializer):
         user_representation = representation.pop('user')
         return {
             'id': representation['id'],
-            'user': {'id': user_representation['id']},
+            'user': {'id': user_representation['id'], 'username': user_representation['username']},
             'text': representation['text'],
             'image': representation['image'],
             'posted_on': representation['posted_on'],

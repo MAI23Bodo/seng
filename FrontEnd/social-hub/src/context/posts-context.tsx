@@ -7,6 +7,6 @@ export default PostsContext;
 
 export interface PostsContextType {
     posts: Post[];
-    deletePost: (id: number) => void;
-    createPost: (post: Post) => void;
+    removePost: (id: number) => void;
+    submitPost: (post: Post) => void;
 }

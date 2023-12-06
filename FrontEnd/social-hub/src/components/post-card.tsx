@@ -1,3 +1,4 @@
+import PostsContext from "@/context/posts-context";
 import UserContext from "@/context/user-context";
 import { Post } from "@/models/post";
 import { useContext } from "react";
@@ -11,10 +12,18 @@ export default function PostCard(props: PostCardProps) {
 
 
     const userContext = useContext(UserContext);
+    const postsContext = useContext(PostsContext);
 
     if (!userContext) return <p>No user context available</p>;
+    if (!postsContext) return <p>No user context available</p>;
 
     const { user } = userContext;
+    const {removePost} = postsContext;
+
+    const onDeletePost = (postId: number) => {
+        console.debug(postsContext)
+        removePost(postId)
+    }
 
     return(
     <div className="card card-compact w-96 bg-base-100 shadow-xl mb-5 break-after-column post">
@@ -25,7 +34,7 @@ export default function PostCard(props: PostCardProps) {
             {
                 props.post.user.id === user?.id &&
                 (<div className="card-actions justify-end">
-                <button className="btn btn-circle btn-outline btn-error">
+                <button className="btn btn-circle btn-outline btn-error" onClick={() => {onDeletePost(props.post.id!)}}>
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
                 <button className="btn btn-circle btn-outline   btn-accent">
