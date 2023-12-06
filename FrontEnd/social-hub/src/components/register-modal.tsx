@@ -9,12 +9,14 @@ export default function RegisterModal() {
     const [password, setPassword] = useState('');
     const [repeatPassword, setRepeatPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const [firstname, setFirstname] = useState('');
+    const [lastname, setLastname] = useState('');
 
     const userContext = useContext(UserContext);
 
     if (!userContext) return <p>No user context available</p>;
 
-    const { login } = userContext;
+    const { register } = userContext;
 
     const formValidation = () => {
         if (username === '') {
@@ -26,6 +28,12 @@ export default function RegisterModal() {
         if (!/\S+@\S+\.\S+/.test(email))
         {
             return 'Invalid Email'
+        }
+        if (firstname === ''){
+            return 'Firstname must be set'
+        }
+        if (lastname === '') {
+            return 'Lastname must be set'
         }
         if (password !== repeatPassword) {
             return 'Password and Repeat Password do not match';
@@ -40,26 +48,16 @@ export default function RegisterModal() {
         setErrorMessage(formValidation())
     })
 
-    const onUsernameChange = async (newUsername: string) => {
-        setUsername(newUsername);
-    }
-
-    const onEmailChange = (newEmail: string) => {
-        setEmail(newEmail);
-    }
-
-    const onPasswordChange = (password: string) => {
-        setPassword(password);
-    }
-
-    const onPasswordRepeatChange = (password: string) => {
-        setRepeatPassword(password);
-    }
     
     const onSubmit = () => {
-        let modal: any =  document.getElementById('register-modal');
-        modal!.close()
-        login(username)
+        let user: User = {id: 0, username: username, userIconUrl: null, first_name: firstname, last_name: lastname, email: email}
+        register(user).then(res => {
+            if (res) {
+                let modal: any =  document.getElementById('register-modal');
+                setErrorMessage('')
+                modal!.close()
+            }
+        })
     }
 
 
@@ -89,7 +87,7 @@ export default function RegisterModal() {
                             placeholder="Type here"
                             className="input input-bordered input-primary w-full"
                             value={username}
-                            onChange={(e) => onUsernameChange(e.target.value)}
+                            onChange={(e) => setUsername(e.target.value)}
                         />
                     </div>
                     <div className="form-control w-full max">
@@ -101,7 +99,31 @@ export default function RegisterModal() {
                             placeholder="Type here"
                             className="input input-bordered input-primary w-full"
                             value={email}
-                            onChange={(e) => onEmailChange(e.target.value)}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
+                    </div>
+                    <div className="form-control w-full max">
+                        <label className="label">
+                            <span className="label-text">First Name</span>
+                        </label>
+                        <input
+                            type="text"
+                            placeholder="Type here"
+                            className="input input-bordered input-primary w-full"
+                            value={firstname}
+                            onChange={(e) => setFirstname(e.target.value)}
+                        />
+                    </div>
+                    <div className="form-control w-full max">
+                        <label className="label">
+                            <span className="label-text">Last Name</span>
+                        </label>
+                        <input
+                            type="text"
+                            placeholder="Type here"
+                            className="input input-bordered input-primary w-full"
+                            value={lastname}
+                            onChange={(e) => setLastname(e.target.value)}
                         />
                     </div>
                     <div className="form-control w-full max-w">
@@ -113,7 +135,7 @@ export default function RegisterModal() {
                             placeholder="Type here"
                             className="input input-bordered input-primary w-full"
                             value={password}
-                            onChange={(e) => onPasswordChange(e.target.value)}
+                            onChange={(e) => setPassword(e.target.value)}
                         />
                     </div>
                     <div className="form-control w-full max-w">
@@ -125,7 +147,7 @@ export default function RegisterModal() {
                             placeholder="Type here"
                             className="input input-bordered input-primary w-full"
                             value={repeatPassword}
-                            onChange={(e) => onPasswordRepeatChange(e.target.value)}
+                            onChange={(e) => setRepeatPassword(e.target.value)}
                         />
                     </div>
                     <button className="btn  btn-primary mt-2" type="button" onClick={onSubmit} disabled = {errorMessage !== ''}>Submit</button>

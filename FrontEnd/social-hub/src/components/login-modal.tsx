@@ -16,16 +16,17 @@ export default function LoginModal() {
     const { login } = userContext;
     
     const onSubmit = () => {
-        if (username === 'Max' && password === 'Test1234!')
-        {
-            let modal: any =  document.getElementById('login-modal');
-            setErrorMessage('invalid username or password')
-            modal!.close()
-            login(username);
-        }
-        else {
-            setErrorMessage('invalid username or password')
-        }
+        login({username: username, password: password})
+        .then(res => {
+            if (res) {
+                let modal: any =  document.getElementById('login-modal');
+                setErrorMessage('')
+                modal!.close()
+            }
+            else {
+                setErrorMessage('invalid username or password')
+            }
+        })
     }
 
     const formValidation = () => {

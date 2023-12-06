@@ -78,7 +78,7 @@ export default function Header(props: HeaderProps) {
                   Profile
                 </a>
               </li>
-              <li><button onClick={() => {console.debug('onClick'); logout()}}>Logout</button></li>
+              <li><button onClick={() => {logout()}}>Logout</button></li>
             </ul>
             </div>
           :

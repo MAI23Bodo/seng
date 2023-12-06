@@ -14,7 +14,7 @@ export default function PostModal() {
     if (!postsContext) return <p>No posts context available</p>;
     if (!userContext) return <p>No user context available</p>;
 
-    const { createPost } = postsContext;
+    const { submitPost } = postsContext;
     const { user } = userContext;
 
     const formValidation = () => {
@@ -28,7 +28,7 @@ export default function PostModal() {
     }
 
     const onSubmit = () => {
-        createPost({
+        submitPost({
             id: null, user: user!, text: text, image: null,
             timestamp: Date.now().toString()
         })
