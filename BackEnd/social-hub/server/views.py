@@ -61,12 +61,8 @@ class UsersView(View):
         if email:
             filter_params['email'] = email
 
-        # TODO: check how to retrieve a list of Users from django.contrib.auth.models import User
-        # users = User.objects.get(**filter_conditions) ?
-        # users = get_list_or_404(User, **filter_conditions)
-        serialized_users = serialize(
-            'json', User.objects.filter(**filter_conditions))
-        return JsonResponse({"users": serialized_users})
+        serialized_users = UserSerializer(User.objects.filter(**filter_params), many=True)
+        return JsonResponse(serialized_users.data, safe=False)
 
     @method_decorator(csrf_exempt)
     def post(self, request):
