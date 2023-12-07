@@ -1,19 +1,42 @@
 # seng
-Software Engineering Repository
+Social Hub - Software Engineering 2023 Repository
 
-This project has been done using django
+To start the project make sure to properly setup the project:
 
-How to start your own django project?
-1) install django
-2) navigate to the desired directory via the command line
-3) with "django-admin startproject your_name" you can start your own project
-4) with "django-admin startapp core you initialize the contents we need for the web app
+Server:
+    - open a terminal and change directory to BackEnd/social-hub
+    - activate a python environment
+    - install dependencies:
+        
+    python -m pip install --upgrade pip
+    pip install --upgrade django djangorestframework
+    pip install --upgrade django-cors-headers
 
-Running the app (using Anaconda Powershell)
-1) with "python manage.py runserver" the project is executed and you get a url that you can copy into your browser to navigate the project
-2) if you make changes to the models.py file (that was created when you started the app) you always need to make the migrations:
-3) "conda manage.py makemigrations"
-4) "conda manage.py migrate"
+    - to start the server type in following command:
 
-- to create an admin you can use tbd
-- 
+    python manage.py runserver
+
+    or
+
+    run InitBackend.bat
+
+    - to run the tests, user following command:
+
+    python manage.py test
+
+Client:
+    - open a terminal and change directory to FrontEnd/social-hub
+    - install dependencies (tested with Node 18.0.0 and npm 8.6.0):
+
+    npm install axios
+
+    - to start the client, use following command:
+
+    npm run dev
+
+    or
+
+    run InitFrontend.bat
+
+Application:
+    - to start the whole application at once, you can execute InitApp.bat (make sure to install all dependencies first!)
