@@ -1,4 +1,5 @@
 @ECHO OFF
 START InitBackend.bat
 START InitFrontend.bat
-PAUSE
+timeout /t 5
+START firefox http://localhost:3000
