@@ -5,9 +5,10 @@ To start the project make sure to properly setup the project:
 
 Server:
     - open a terminal and change directory to BackEnd/social-hub
+    - install python 3.9
     - activate a python environment
     - install dependencies:
-        
+    
     python -m pip install --upgrade pip
     pip install --upgrade django djangorestframework
     pip install --upgrade django-cors-headers
