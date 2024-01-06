@@ -6,7 +6,8 @@ const PostsContext = React.createContext<PostsContextType | null>(null);
 export default PostsContext;
 
 export interface PostsContextType {
-    posts: Post[];
-    removePost: (id: number) => void;
-    submitPost: (post: Post) => void;
+    posts: Post[]
+    removePost: (id: number) => void
+    submitPost: (post: Post) => void
+    changePost: (id: string, text: string) => void
 }

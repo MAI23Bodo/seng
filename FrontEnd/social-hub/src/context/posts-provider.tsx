@@ -41,7 +41,7 @@ const PostsProvider: React.FC<PostsProviderProps> = ({ children }) => {
 
   const [posts, setPosts] = useState<PostsContextType['posts']>(initial_posts);
   const [loaded, setLoaded] = useState(false);
-  const {getPosts, createPost, deletePost} = useRequests();
+  const {getPosts, createPost, deletePost, updatePost} = useRequests();
 
   const removePost = (id: number) => {
     deletePost(id).then(() => {
@@ -55,9 +55,21 @@ const PostsProvider: React.FC<PostsProviderProps> = ({ children }) => {
     createPost(post).then(res => {
       setPosts(posts => posts.concat(res));
     })
-    
   };
  
+  const changePost = (id: string, text: string) => {
+    updatePost(id, text).then(res => {
+      setPosts(posts => posts.map(post => {
+        if (post.id === res.id) {
+          return {
+            ...post,
+            ...res
+          };
+        }
+        return post;
+      }));
+    })
+  }
 
   useEffect(() => {
     if(!loaded) {
@@ -72,7 +84,7 @@ const PostsProvider: React.FC<PostsProviderProps> = ({ children }) => {
   })
 
   return (
-    <PostsContext.Provider value={{ posts, removePost, submitPost }}>
+    <PostsContext.Provider value={{ posts, removePost, submitPost , changePost}}>
       {children}
     </PostsContext.Provider>
   );

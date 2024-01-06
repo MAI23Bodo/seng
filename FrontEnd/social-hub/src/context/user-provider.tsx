@@ -29,8 +29,8 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         setUser(null);
     };
 
-    const register = (user: User) => {
-        return createUser(user).then(repsonse => {
+    const register = (credentials: Credentials) => {
+        return createUser(credentials).then(repsonse => {
             setUser(repsonse)
             return true;
         })

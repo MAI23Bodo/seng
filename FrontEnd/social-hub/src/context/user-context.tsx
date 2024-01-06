@@ -8,7 +8,7 @@ export default UserContext;
 
 export interface UserContextType {
     user: User | null;
-    register: (user: User) => Promise<boolean>;
+    register: (user: Credentials) => Promise<boolean>;
     login: (credentials: Credentials) => Promise<boolean>;
     logout: () => void;
 }

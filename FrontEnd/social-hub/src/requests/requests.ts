@@ -1,6 +1,5 @@
 import { Credentials } from "@/models/credentials";
 import { Post } from "@/models/post";
-import { User } from "@/models/user";
 import axios from "axios";
 
 export const useRequests = () => {
@@ -15,6 +14,7 @@ export const useRequests = () => {
   });
 
   const postLogin = async (credentials: Credentials) => {
+    console.debug(credentials)
     let response = await instance.postForm('/login/', credentials)
     if (response.status !== 200) {
       console.warn('login failded')
@@ -23,8 +23,8 @@ export const useRequests = () => {
     return response.data
   }
 
-  const createUser = async (user: User) => {
-    let response = await instance.postForm('/users/', user)
+  const createUser = async (credentials: Credentials) => {
+    let response = await instance.postForm('/users/', credentials)
     if (response.status !== 200) {
       console.warn('could not create user')
     }
@@ -58,5 +58,16 @@ export const useRequests = () => {
     }
   }
 
-  return {postLogin, getPosts, createUser, createPost, deletePost}
+  const updatePost = async (postId: string, text: string) => {
+    let dto = {
+      'text': text
+    }
+    let response = await instance.put(`/posts/${postId}/`, dto)
+    if (response.status !== 200)  {
+      console.warn("update post did not work")
+    }
+    return response.data
+  }
+
+  return {postLogin, getPosts, createUser, createPost, deletePost, updatePost}
 }
