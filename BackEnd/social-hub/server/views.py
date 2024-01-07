@@ -14,6 +14,7 @@ from PIL import Image
 from io import BytesIO
 import uuid
 import os
+import pika
 
 
 from django.contrib.auth.models import User
@@ -160,8 +161,6 @@ class PostsView(View):
     def post(self, request):
         user = request.POST.get('user')
         img_base64 = request.POST['image']
-
-        print(img_base64)
         img_data = base64.b64decode(img_base64)
         img = Image.open(BytesIO(img_data))
         image_id = uuid.uuid4()
@@ -180,6 +179,16 @@ class PostsView(View):
             image=image_link
         )
         post.save()
+
+        connection_params = pika.ConnectionParameters('localhost')
+        connection = pika.BlockingConnection(connection_params)
+        channel = connection.channel()
+        queue_name = 'resize_queue'
+        channel.queue_declare(queue=queue_name)
+        message_object = {'image': img_base64, 'id': str(post.id)}
+        message = json.dumps(message_object)
+        channel.basic_publish(exchange='', routing_key=queue_name, body=message)
+        connection.close()
         return JsonResponse(PostSerializer(post).data, safe=False)
 
 # /posts/<id> - get + patch + put + delete

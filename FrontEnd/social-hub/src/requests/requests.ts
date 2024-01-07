@@ -19,7 +19,6 @@ export const useRequests = () => {
     if (response.status !== 200) {
       console.warn('login failded')
     }
-    console.debug(response.data)
     return response.data
   }
 
@@ -34,7 +33,8 @@ export const useRequests = () => {
   const createPost = async (post: Post) => {
     let dto = {
       'text': post.text,
-      'user.id': post.user.id
+      'user.id': post.user.id,
+      'image': post.image
     }
     let response = await instance.postForm('/posts/', dto)
     if (response.status !== 200) {

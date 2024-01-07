@@ -5,7 +5,7 @@ import { useContext, useEffect, useState } from "react";
 export default function PostModal() {
 
     const [text, setText] = useState({value: '', status: 'primary', error: ''});
-    const [image, setImage] = useState<File | null>(null);
+    const [image, setImage] = useState<string | null>(null);
 
     const postsContext = useContext(PostsContext);
     const userContext = useContext(UserContext) 
@@ -24,10 +24,27 @@ export default function PostModal() {
         setText({value: newValue, status: 'success', error: ''})
     }
 
+    const convertToBase64 = (file: File) => {
+        return new Promise((resolve, reject) => {
+          const fileReader = new FileReader();
+          fileReader.readAsDataURL(file);
+          fileReader.onload = () => {
+            resolve(fileReader.result);
+          };
+          fileReader.onerror = (error) => {
+            reject(error);
+          };
+        });
+      };
+
     const onSubmit = () => {
         submitPost({
-            id: null, user: user!, text: text.value, image: null,
-            timestamp: Date.now().toString()
+            id: null, user: user!,
+            text: text.value,
+            image: image,
+            timestamp: Date.now().toString(),
+            preview_image: null,
+            emotion: null            
         })
         let modal: any =  document.getElementById('post-modal');
         modal!.close()
@@ -39,7 +56,11 @@ export default function PostModal() {
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
-            setImage(e.target.files[0]);
+            convertToBase64(e.target.files[0]).then(res => {
+                let base64 = res as string
+                setImage(base64.split('base64,')[1]);
+            })
+            
           }
     }
 
