@@ -9,6 +9,12 @@ from server.serializers import UserSerializer, PostSerializer
 from django.utils import timezone
 from django.shortcuts import get_object_or_404, get_list_or_404
 import json
+import base64
+from PIL import Image
+from io import BytesIO
+import uuid
+import os
+
 
 from django.contrib.auth.models import User
 from .models import Post
@@ -153,11 +159,25 @@ class PostsView(View):
     #@method_decorator(login_required())
     def post(self, request):
         user = request.POST.get('user')
-        print(user)
+        img_base64 = request.POST['image']
+
+        print(img_base64)
+        img_data = base64.b64decode(img_base64)
+        img = Image.open(BytesIO(img_data))
+        image_id = uuid.uuid4()
+
+        # Create the folder if it doesn't exist
+        folder_path = 'images'
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+        
+        image_link = f'{image_id}.{img.format}'
+        img.save(f'images/{image_link}')
         post = Post.objects.create(
             user_id=request.POST.get('user.id'),
             text=request.POST.get('text'),
-            posted_on=timezone.now()
+            posted_on=timezone.now(),
+            image=image_link
         )
         post.save()
         return JsonResponse(PostSerializer(post).data, safe=False)

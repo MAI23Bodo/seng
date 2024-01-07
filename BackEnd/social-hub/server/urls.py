@@ -10,8 +10,6 @@ urlpatterns = [
     path('users/<int:id>/', UserDetailView.as_view(), name='user_detail'),
     path('posts/', PostsView.as_view(), name='posts'),
     path('posts/<id>/', PostDetailView.as_view(), name='post_detail'),
-    #TODO: image endpoint
-
     #for development only:
     path("admin/", admin.site.urls),
 ]
