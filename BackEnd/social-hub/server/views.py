@@ -15,6 +15,11 @@ from io import BytesIO
 import uuid
 import os
 import pika
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.authtoken.models import Token
 
 
 from django.contrib.auth.models import User
@@ -31,8 +36,9 @@ class LoginView(View):
 
         user = authenticate(request, username=username, password=password)
         if user is not None:
-            login(request, user)
-            return JsonResponse({"userId": user.id})
+            token = Token.objects.create(user=user)
+            print(token.key)
+            return JsonResponse({"userId": user.id, 'token': str(token)})
         else:
             return JsonResponse({"error": "Invalid credentials"})
 
@@ -131,7 +137,9 @@ class UserDetailView(View):
 
 # /posts - get + post
 class PostsView(View):
-    #@method_decorator(login_required())
+    
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         # Get filter parameters from the request
         id = request.GET.get('id')

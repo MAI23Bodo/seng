@@ -14,7 +14,6 @@ export const useRequests = () => {
   });
 
   const postLogin = async (credentials: Credentials) => {
-    console.debug(credentials)
     let response = await instance.postForm('/login/', credentials)
     if (response.status !== 200) {
       console.warn('login failded')
@@ -30,13 +29,13 @@ export const useRequests = () => {
     return response.data
   }
 
-  const createPost = async (post: Post) => {
+  const createPost = async (post: Post, token: string) => {
     let dto = {
       'text': post.text,
       'user.id': post.user.id,
       'image': post.image
     }
-    let response = await instance.postForm('/posts/', dto)
+    let response = await instance.postForm('/posts/', dto, {headers: {Authorization: token}})
     if (response.status !== 200) {
       console.warn('could not create post')
     }
@@ -51,18 +50,18 @@ export const useRequests = () => {
     return response.data
   }
 
-  const deletePost = async (postId: number) => {
-    let response = await instance.delete(`/posts/${postId}/`)
+  const deletePost = async (postId: number, token: string) => {
+    let response = await instance.delete(`/posts/${postId}/`, {headers: {Authorization: token}})
     if (response.status !== 200)  {
       console.warn("delete did not work")
     }
   }
 
-  const updatePost = async (postId: string, text: string) => {
+  const updatePost = async (postId: string, text: string, token: string) => {
     let dto = {
       'text': text
     }
-    let response = await instance.put(`/posts/${postId}/`, dto)
+    let response = await instance.put(`/posts/${postId}/`, dto, {headers: {Authorization: token}})
     if (response.status !== 200)  {
       console.warn("update post did not work")
     }

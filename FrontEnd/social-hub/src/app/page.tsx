@@ -1,7 +1,6 @@
 "use client";
 
 import Dashboard from '@/components/dashboard';
-import Header from '@/components/header'
 import PostsProvider from '@/context/posts-provider';
 import UserProvider from '@/context/user-provider';
 

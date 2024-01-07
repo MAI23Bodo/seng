@@ -32,6 +32,7 @@ DEBUG = True
 INSTALLED_APPS = [
     'server.apps.ServerConfig',
     'rest_framework',
+    'rest_framework.authtoken',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -118,9 +119,9 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
 
 
 # Authentication
-LOGIN_REDIRECT_URL = '/posts/' # URL to redirect to after login
-LOGIN_URL = '' # URL to redirect to if login_required() gets called
-LOGOUT_REDIRECT_URL = '' # URL to redirect to after logout
+#LOGIN_REDIRECT_URL = '/posts/' # URL to redirect to after login
+#LOGIN_URL = '' # URL to redirect to if login_required() gets called
+#LOGOUT_REDIRECT_URL = '' # URL to redirect to after logout
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -169,3 +170,10 @@ MEDIA_URL = '/images/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}
