@@ -17,9 +17,9 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install Dependencies
       run: |
+        cd ./BackEnd/social-hub
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        python -m pip install --upgrade pip
     - name: Run Tests
       run: |
         cd ./BackEnd/social-hub
