@@ -168,39 +168,60 @@ class PostsView(View):
     #@method_decorator(login_required())
     def post(self, request):
         user = request.POST.get('user')
-        img_base64 = request.POST['image']
-        img_data = base64.b64decode(img_base64)
-        img = Image.open(BytesIO(img_data))
-        image_id = uuid.uuid4()
+        text = request.POST.get('text')
+        user_id = request.POST.get('user.id')
+        posted_on = timezone.now()
 
-        # Create the folder if it doesn't exist
-        folder_path = 'images'
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
-        
-        image_link = f'{image_id}.{img.format}'
-        img.save(f'images/{image_link}')
-        post = Post.objects.create(
-            user_id=request.POST.get('user.id'),
-            text=request.POST.get('text'),
-            posted_on=timezone.now(),
-            image=image_link
-        )
+        # Create post with or without image
+        if 'image' in request.POST:
+            img_base64 = request.POST['image']
+            img_data = base64.b64decode(img_base64)
+            img = Image.open(BytesIO(img_data))
+            image_id = uuid.uuid4()
+
+            # Create the folder if it doesn't exist
+            folder_path = 'images'
+            if not os.path.exists(folder_path):
+                os.makedirs(folder_path)
+
+            image_link = f'{image_id}.{img.format}'
+            img.save(f'images/{image_link}')
+
+            post = Post.objects.create(
+                user_id=user_id,
+                text=text,
+                posted_on=posted_on,
+                image=image_link
+            )
+        else:
+            post = Post.objects.create(
+                user_id=user_id,
+                text=text,
+                posted_on=posted_on
+            )
+
         post.save()
 
+        # RabbitMQ connection and message publishing
         connection_params = pika.ConnectionParameters('localhost')
         connection = pika.BlockingConnection(connection_params)
         channel = connection.channel()
-        queue_name = 'resize_queue'
-        channel.queue_declare(queue=queue_name)
-        message_object = {'image': img_base64, 'id': str(post.id)}
-        message = json.dumps(message_object)
-        channel.basic_publish(exchange='', routing_key=queue_name, body=message)
+
+        # Message for resize queue only if image is present
+        if 'image' in request.POST:
+            queue_name = 'resize_queue'
+            channel.queue_declare(queue=queue_name)
+            message_object = {'image': img_base64, 'id': str(post.id)}
+            message = json.dumps(message_object)
+            channel.basic_publish(exchange='', routing_key=queue_name, body=message)
+
+        # Message for AI queue
         queue_name = 'ai_queue'
         channel.queue_declare(queue=queue_name)
-        message_object = {'message': request.POST.get("text"), 'id': str(post.id)}
+        message_object = {'message': text, 'id': str(post.id)}
         message = json.dumps(message_object)
         channel.basic_publish(exchange='', routing_key=queue_name, body=message)
+
         connection.close()
         return JsonResponse(PostSerializer(post).data, safe=False)
     
