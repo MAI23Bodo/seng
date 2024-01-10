@@ -1,13 +1,16 @@
 'use client';
 import UserContext from "@/context/user-context";
-import { useContext } from "react";
+import { Dispatch, SetStateAction, useContext } from "react";
 import React from "react";
 import { DisplayPage } from "./dashboard";
+import { SearchBar } from "./searchbar";
 
 interface HeaderProps {
   viewFrom: (id: number) => void;
   switchPage: (targetPage: DisplayPage) => void;
   displayPage: DisplayPage
+  search: string | null
+  setSearch: Dispatch<SetStateAction<string | null>>
 }
 
 export default function Header(props: HeaderProps) {
@@ -47,15 +50,6 @@ export default function Header(props: HeaderProps) {
   }, [theme]);
 
 
-  const SearchBar = () => {
-    if (props.displayPage === DisplayPage.Posts) {
-      return (
-        <div className="form-control">
-          <input type="text" placeholder="Search" className="input input-bordered w-24 md:w-auto" />
-        </div>
-      )
-    }
-  }
 
   const NewPostButton = () => {
     if (user && props.displayPage === DisplayPage.Posts) {
@@ -94,7 +88,7 @@ export default function Header(props: HeaderProps) {
           NewPostButton()
         }
         {
-          SearchBar()
+          SearchBar({search: props.search, setSearch: props.setSearch})
         }
         {
           UpdateButton()

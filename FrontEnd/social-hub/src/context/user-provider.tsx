@@ -33,7 +33,7 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     const login = (credentials: Credentials) => {
         return postLogin(credentials).then(result => {
             if (result.userId) {
-                setUser({ username: credentials.username, email: '', id: result.userId, first_name: '', last_name: '', userIconUrl: ''})
+                setUser({ username: credentials.username, email: null, id: result.userId, first_name: null, last_name: null, userIconUrl: '', password: null})
                 setToken(`Token ${result.token}`)
                 localStorage.setItem(tokenStorageKey, result.token)
                 localStorage.setItem(userStorageKey, JSON.stringify({id: result.userId, username: credentials.username}))
@@ -61,7 +61,7 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     }
 
     return (
-        <UserContext.Provider value={{ user, token, login, logout, register}}>
+        <UserContext.Provider value={{ user, setUser, token, login, logout, register}}>
             {children}
         </UserContext.Provider>
     );
