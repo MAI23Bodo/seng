@@ -196,8 +196,14 @@ class PostsView(View):
         message_object = {'image': img_base64, 'id': str(post.id)}
         message = json.dumps(message_object)
         channel.basic_publish(exchange='', routing_key=queue_name, body=message)
+        queue_name = 'ai_queue'
+        channel.queue_declare(queue=queue_name)
+        message_object = {'message': request.POST.get("text"), 'id': str(post.id)}
+        message = json.dumps(message_object)
+        channel.basic_publish(exchange='', routing_key=queue_name, body=message)
         connection.close()
         return JsonResponse(PostSerializer(post).data, safe=False)
+    
 
 # /posts/<id> - get + patch + put + delete
 class PostDetailView(View):

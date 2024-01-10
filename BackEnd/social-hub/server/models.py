@@ -12,3 +12,4 @@ class Post(models.Model):
     preview_image = models.TextField(null=True)
     posted_on = models.DateTimeField(null=True)
     updated_on = models.DateTimeField(null=True)
+    sentiment = models.TextField(null=True)
