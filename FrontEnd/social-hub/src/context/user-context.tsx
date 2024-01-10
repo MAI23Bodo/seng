@@ -13,4 +13,6 @@ export interface UserContextType {
     register: (user: Credentials) => Promise<boolean>;
     login: (credentials: Credentials) => Promise<boolean>;
     logout: () => void;
+    editUser: (user: User) => void
+    findUser: (userId: number) => void
 }

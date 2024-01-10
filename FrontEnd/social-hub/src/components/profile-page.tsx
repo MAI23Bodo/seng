@@ -1,6 +1,6 @@
 import UserContext from "@/context/user-context";
 import { User } from "@/models/user";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 export default function ProfilePage() {
 
@@ -8,17 +8,15 @@ export default function ProfilePage() {
 
     if (!userContext) return <p>No user context available</p>;
 
-    const { user,  setUser} = userContext;
+    const { user,  setUser, findUser} = userContext;
 
-    // const [username, setUsername] = useState(user?.username);
-    // const [email, setEmail] = useState(user?.email);
-    // const [password, setPassword] = useState('');
-    // const [repeatPassword, setRepeatPassword] = useState('');
-    // const [firstname, setFirstname] = useState(user?.first_name);
-    // const [lastname, setLastname] = useState(user?.last_name);
-    // 
-    // const onSubmit = () => {
-    // }
+    // useEffect(() => {
+    //     if (user?.id !== null && user?.id !== undefined)
+    //     {
+    //         findUser(user?.id)
+    //     }
+    //     
+    // })
 
     const onUsernameChange = (username: string) => {
         setUser(user =>  {
@@ -54,17 +52,6 @@ export default function ProfilePage() {
     return (
         <div className="hero ">
             <div className="hero-content flex-col lg:flex-row">
-                <div className="card shrink-0 w-full max-w-sm shadow-2xl bg-base-300">
-                    <form method="post" className="card-body">
-                        <h2 className="card-title">My Image</h2>
-                        <div className="avatar">
-                            <div className="w-24 mask mask-hexagon">
-                                <img src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
-                            </div>
-                        </div>
-                        <input type="file" className="file-input w-full max-w-xs" ></input>
-                    </form>
-                </div>
                 <div>
                     <div className="card shrink-0 w-full max-w-sm shadow-2xl bg-base-300">
                         <form method="post" className="card-body">

@@ -16,6 +16,7 @@ export default function Dashboard() {
     const [filterId, setFilterId] = useState(0);
     const [search, setSearch] = useState<string | null>(null)
     const [displayPage, setDisplayPage] = useState(DisplayPage.Posts)
+    
 
     const postsContext = useContext(PostsContext);
     if (!postsContext) return <p>No posts context available</p>
@@ -29,6 +30,12 @@ export default function Dashboard() {
             result = result.filter(p => p.text?.includes(search))
         }
         return result
+    }
+
+    const resetFilters = () => {
+        setFilterId(0)
+        setSearch(null)
+        setDisplayPage(DisplayPage.Posts)
     }
     
     const viewFrom = (id: number) => {
@@ -52,7 +59,7 @@ export default function Dashboard() {
             <LoginModal></LoginModal>
             <RegisterModal></RegisterModal>
             <PostModal></PostModal>
-            <Header viewFrom={viewFrom} switchPage={setDisplayPage} displayPage={displayPage} search={search} setSearch={setSearch}></Header>
+            <Header resetFilters={resetFilters} switchPage={setDisplayPage} displayPage={displayPage} search={search} setSearch={setSearch}></Header>
             <main className="flex min-h-screen flex-col items-center justify-between p-24">
                {pageRouting()}
             </main>
