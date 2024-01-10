@@ -1,6 +1,6 @@
 import UserContext from "@/context/user-context";
 import { User } from "@/models/user";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 export default function ProfilePage() {
 
@@ -8,32 +8,50 @@ export default function ProfilePage() {
 
     if (!userContext) return <p>No user context available</p>;
 
-    const { user } = userContext;
+    const { user,  setUser, findUser} = userContext;
 
-    const [username, setUsername] = useState(user?.username);
-    const [email, setEmail] = useState(user?.email);
-    const [password, setPassword] = useState('');
-    const [repeatPassword, setRepeatPassword] = useState('');
-    const [firstname, setFirstname] = useState(user?.first_name);
-    const [lastname, setLastname] = useState(user?.last_name);
+    // useEffect(() => {
+    //     if (user?.id !== null && user?.id !== undefined)
+    //     {
+    //         findUser(user?.id)
+    //     }
+    //     
+    // })
 
-    const onSubmit = () => {
-
+    const onUsernameChange = (username: string) => {
+        setUser(user =>  {
+            return {...user, username: username} as User
+        })
     }
+
+    const onPasswordChange = (password: string) => {
+        setUser(user =>  {
+            return {...user, password: password} as User
+        })
+    }
+
+    const onEmailChange = (email: string) => {
+        setUser(user =>  {
+            return {...user, email: email} as User
+        })
+    }
+
+    const onFirstnameChange = (firstname: string) => {
+        setUser(user =>  {
+            return {...user, first_name: firstname} as User
+        })
+    }
+
+    const onLastnameChange = (lastname: string) => {
+        setUser(user =>  {
+            return {...user, last_name: lastname} as User
+        })
+    }
+    
+
     return (
         <div className="hero ">
             <div className="hero-content flex-col lg:flex-row">
-                <div className="card shrink-0 w-full max-w-sm shadow-2xl bg-base-300">
-                    <form method="post" className="card-body">
-                        <h2 className="card-title">My Image</h2>
-                        <div className="avatar">
-                            <div className="w-24 mask mask-hexagon">
-                                <img src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
-                            </div>
-                        </div>
-                        <input type="file" className="file-input w-full max-w-xs" ></input>
-                    </form>
-                </div>
                 <div>
                     <div className="card shrink-0 w-full max-w-sm shadow-2xl bg-base-300">
                         <form method="post" className="card-body">
@@ -46,8 +64,8 @@ export default function ProfilePage() {
                                     type="text"
                                     placeholder="Type here"
                                     className="input input-bordered input-primary w-full"
-                                    value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
+                                    value={user?.username}
+                                    onChange={(e) => onUsernameChange(e.target.value)}
                                 />
                             </div>
                             <div className="form-control w-full max-w">
@@ -58,8 +76,8 @@ export default function ProfilePage() {
                                     type="password"
                                     placeholder="Type here"
                                     className="input input-bordered input-primary w-full"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
+                                    value={user?.password ?? ''}
+                                    onChange={(e) => onPasswordChange(e.target.value)}
                                 />
                             </div>
                             <div className="form-control w-full max-w">
@@ -70,8 +88,8 @@ export default function ProfilePage() {
                                     type="password"
                                     placeholder="Type here"
                                     className="input input-bordered input-primary w-full"
-                                    value={repeatPassword}
-                                    onChange={(e) => setRepeatPassword(e.target.value)}
+                                    value={''}
+                                    onChange={(e) => onPasswordChange(e.target.value)}
                                 />
                             </div>
                         </form>
@@ -88,8 +106,8 @@ export default function ProfilePage() {
                                 type="email"
                                 placeholder="Type here"
                                 className="input input-bordered input-primary w-full"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                value={user?.email ?? ''}
+                                onChange={(e) => onEmailChange(e.target.value)}
                             />
                         </div>
                         <div className="form-control w-full max">
@@ -100,8 +118,8 @@ export default function ProfilePage() {
                                 type="text"
                                 placeholder="Type here"
                                 className="input input-bordered input-primary w-full"
-                                value={firstname}
-                                onChange={(e) => setFirstname(e.target.value)}
+                                value={user?.first_name ?? ''}
+                                onChange={(e) => onFirstnameChange(e.target.value)}
                             />
                         </div>
                         <div className="form-control w-full max">
@@ -112,8 +130,8 @@ export default function ProfilePage() {
                                 type="text"
                                 placeholder="Type here"
                                 className="input input-bordered input-primary w-full"
-                                value={lastname}
-                                onChange={(e) => setLastname(e.target.value)}
+                                value={user?.last_name ?? ''}
+                                onChange={(e) => onLastnameChange(e.target.value)}
                             />
                         </div>
                     </form>

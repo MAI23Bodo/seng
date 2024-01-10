@@ -1,5 +1,6 @@
 import { Credentials } from "@/models/credentials";
 import { Post } from "@/models/post";
+import { User } from "@/models/user";
 import axios from "axios";
 
 export const useRequests = () => {
@@ -68,5 +69,36 @@ export const useRequests = () => {
     return response.data
   }
 
-  return {postLogin, getPosts, createUser, createPost, deletePost, updatePost}
+  const logoutPost = async (token: string) => {
+    let response = await instance.put(`/logout/`, null, {headers: {Authorization: token}})
+    if (response.status !== 200)  {
+      console.warn("logout ditd not work")
+    }
+    return response.data
+  }
+
+  const updateUser = async (user: User, token: string) => {
+    let dto = {
+      'username': user.username,
+      'first_name': user.first_name,
+      'last_name': user.last_name,
+      'email': user.email,
+      'password': user.password,
+    }
+    let response = await instance.put(`/users/${user.id}/`, dto, {headers: {Authorization: token}})
+    if (response.status !== 200)  {
+      console.warn("update post did not work")
+    }
+    return response.data
+  }
+
+  const getUser = async (userId: number, token: string) => {
+    let response = await instance.get(`/users/${userId}/`, {headers: {Authorization: token}})
+    if (response.status !== 200)  {
+      console.warn("getuser did not work")
+    }
+    return response.data
+  }
+
+  return {postLogin, getPosts, createUser, createPost, deletePost, updatePost, logoutPost, updateUser, getUser}
 }
