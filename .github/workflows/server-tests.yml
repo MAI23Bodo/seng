@@ -18,8 +18,8 @@ jobs:
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install --upgrade django djangorestframework
-        pip install --upgrade django-cors-headers
+        pip install -r requirements.txt
+        python -m pip install --upgrade pip
     - name: Run Tests
       run: |
         cd ./BackEnd/social-hub
