@@ -9,6 +9,18 @@ from server.serializers import UserSerializer, PostSerializer
 from django.utils import timezone
 from django.shortcuts import get_object_or_404, get_list_or_404
 import json
+import base64
+from PIL import Image
+from io import BytesIO
+import uuid
+import os
+import pika
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.authtoken.models import Token
+
 
 from django.contrib.auth.models import User
 from .models import Post
@@ -24,8 +36,9 @@ class LoginView(View):
 
         user = authenticate(request, username=username, password=password)
         if user is not None:
-            login(request, user)
-            return JsonResponse({"userId": user.id})
+            token = Token.objects.create(user=user)
+            print(token.key)
+            return JsonResponse({"userId": user.id, 'token': str(token)})
         else:
             return JsonResponse({"error": "Invalid credentials"})
 
@@ -67,11 +80,7 @@ class UsersView(View):
     @method_decorator(csrf_exempt)
     def post(self, request):
         user = User.objects.create_user(
-            username=request.POST.get('username'),
-            email=request.POST.get('email'),
-            first_name=request.POST.get('first_name'),
-            last_name=request.POST.get('last_name')
-        )
+            username=request.POST.get('username'))
         user.set_password(request.POST.get('password'))
         user.save()
         return JsonResponse(UserSerializer(user).data, safe=False)
@@ -128,7 +137,9 @@ class UserDetailView(View):
 
 # /posts - get + post
 class PostsView(View):
-    #@method_decorator(login_required())
+    
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         # Get filter parameters from the request
         id = request.GET.get('id')
@@ -157,14 +168,63 @@ class PostsView(View):
     #@method_decorator(login_required())
     def post(self, request):
         user = request.POST.get('user')
-        print(user)
-        post = Post.objects.create(
-            user_id=request.POST.get('user.id'),
-            text=request.POST.get('text'),
-            posted_on=timezone.now()
-        )
+        text = request.POST.get('text')
+        user_id = request.POST.get('user.id')
+        posted_on = timezone.now()
+
+        # Create post with or without image
+        if 'image' in request.POST:
+            img_base64 = request.POST['image']
+            img_data = base64.b64decode(img_base64)
+            img = Image.open(BytesIO(img_data))
+            image_id = uuid.uuid4()
+
+            # Create the folder if it doesn't exist
+            folder_path = 'images'
+            if not os.path.exists(folder_path):
+                os.makedirs(folder_path)
+
+            image_link = f'{image_id}.{img.format}'
+            img.save(f'images/{image_link}')
+
+            post = Post.objects.create(
+                user_id=user_id,
+                text=text,
+                posted_on=posted_on,
+                image=image_link
+            )
+        else:
+            post = Post.objects.create(
+                user_id=user_id,
+                text=text,
+                posted_on=posted_on
+            )
+
         post.save()
+
+        # RabbitMQ connection and message publishing
+        connection_params = pika.ConnectionParameters('localhost')
+        connection = pika.BlockingConnection(connection_params)
+        channel = connection.channel()
+
+        # Message for resize queue only if image is present
+        if 'image' in request.POST:
+            queue_name = 'resize_queue'
+            channel.queue_declare(queue=queue_name)
+            message_object = {'image': img_base64, 'id': str(post.id)}
+            message = json.dumps(message_object)
+            channel.basic_publish(exchange='', routing_key=queue_name, body=message)
+
+        # Message for AI queue
+        queue_name = 'ai_queue'
+        channel.queue_declare(queue=queue_name)
+        message_object = {'message': text, 'id': str(post.id)}
+        message = json.dumps(message_object)
+        channel.basic_publish(exchange='', routing_key=queue_name, body=message)
+
+        connection.close()
         return JsonResponse(PostSerializer(post).data, safe=False)
+    
 
 # /posts/<id> - get + patch + put + delete
 class PostDetailView(View):

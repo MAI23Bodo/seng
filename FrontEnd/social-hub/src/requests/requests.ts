@@ -1,6 +1,5 @@
 import { Credentials } from "@/models/credentials";
 import { Post } from "@/models/post";
-import { User } from "@/models/user";
 import axios from "axios";
 
 export const useRequests = () => {
@@ -19,24 +18,24 @@ export const useRequests = () => {
     if (response.status !== 200) {
       console.warn('login failded')
     }
-    console.debug(response.data)
     return response.data
   }
 
-  const createUser = async (user: User) => {
-    let response = await instance.postForm('/users/', user)
+  const createUser = async (credentials: Credentials) => {
+    let response = await instance.postForm('/users/', credentials)
     if (response.status !== 200) {
       console.warn('could not create user')
     }
     return response.data
   }
 
-  const createPost = async (post: Post) => {
+  const createPost = async (post: Post, token: string) => {
     let dto = {
       'text': post.text,
-      'user.id': post.user.id
+      'user.id': post.user.id,
+      'image': post.image
     }
-    let response = await instance.postForm('/posts/', dto)
+    let response = await instance.postForm('/posts/', dto, {headers: {Authorization: token}})
     if (response.status !== 200) {
       console.warn('could not create post')
     }
@@ -51,12 +50,23 @@ export const useRequests = () => {
     return response.data
   }
 
-  const deletePost = async (postId: number) => {
-    let response = await instance.delete(`/posts/${postId}/`)
+  const deletePost = async (postId: number, token: string) => {
+    let response = await instance.delete(`/posts/${postId}/`, {headers: {Authorization: token}})
     if (response.status !== 200)  {
       console.warn("delete did not work")
     }
   }
 
-  return {postLogin, getPosts, createUser, createPost, deletePost}
+  const updatePost = async (postId: string, text: string, token: string) => {
+    let dto = {
+      'text': text
+    }
+    let response = await instance.put(`/posts/${postId}/`, dto, {headers: {Authorization: token}})
+    if (response.status !== 200)  {
+      console.warn("update post did not work")
+    }
+    return response.data
+  }
+
+  return {postLogin, getPosts, createUser, createPost, deletePost, updatePost}
 }

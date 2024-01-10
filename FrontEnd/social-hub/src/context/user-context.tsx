@@ -8,7 +8,8 @@ export default UserContext;
 
 export interface UserContextType {
     user: User | null;
-    register: (user: User) => Promise<boolean>;
+    token: string | null
+    register: (user: Credentials) => Promise<boolean>;
     login: (credentials: Credentials) => Promise<boolean>;
     logout: () => void;
 }

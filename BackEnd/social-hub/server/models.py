@@ -9,5 +9,7 @@ class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.TextField()
     image = models.URLField(null=True)
+    preview_image = models.TextField(null=True)
     posted_on = models.DateTimeField(null=True)
     updated_on = models.DateTimeField(null=True)
+    sentiment = models.TextField(null=True)

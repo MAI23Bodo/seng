@@ -1,14 +1,13 @@
 'use client';
-import { User } from "@/models/user";
-import LoginModal from "./login-modal";
-import RegisterModal from "./register-modal";
 import UserContext from "@/context/user-context";
 import { useContext } from "react";
 import React from "react";
-import PostModal from "./post-modal";
+import { DisplayPage } from "./dashboard";
 
 interface HeaderProps {
   viewFrom: (id: number) => void;
+  switchPage: (targetPage: DisplayPage) => void;
+  displayPage: DisplayPage
 }
 
 export default function Header(props: HeaderProps) {
@@ -17,7 +16,7 @@ export default function Header(props: HeaderProps) {
 
   if (!userContext) return <p>No user context available</p>;
 
-  const { user, login, logout } = userContext;
+  const { user, logout } = userContext;
   
   const onOpenLoginModel = () => {
     let modal: any =  document.getElementById('login-modal');
@@ -34,6 +33,10 @@ export default function Header(props: HeaderProps) {
     modal.showModal()
   }
 
+  const onProfile = () => {
+    props.switchPage(DisplayPage.User)
+  }
+
   const [theme, setTheme] = React.useState('synthwave');
   const toggleTheme = () => {
     setTheme(theme === 'synthwave' ? 'cupcake' : 'synthwave');
@@ -43,11 +46,41 @@ export default function Header(props: HeaderProps) {
     document.querySelector('html')?.setAttribute('data-theme', theme);
   }, [theme]);
 
+
+  const SearchBar = () => {
+    if (props.displayPage === DisplayPage.Posts) {
+      return (
+        <div className="form-control">
+          <input type="text" placeholder="Search" className="input input-bordered w-24 md:w-auto" />
+        </div>
+      )
+    }
+  }
+
+  const NewPostButton = () => {
+    if (user && props.displayPage === DisplayPage.Posts) {
+      return (
+        <button className="btn btn-outline btn-primary" onClick={onOpenPostModal}>New Post</button>
+      )
+    }
+    return (
+      <div/>
+    )
+  }
+
+  const UpdateButton = () => {
+    if (user && props.displayPage === DisplayPage.User) {
+      return (
+        <button className="btn btn-outline btn-primary" onClick={onOpenPostModal}>Update User</button>
+      )
+    }
+    return (
+      <div/>
+    )
+  }
+
   return(
     <div className="navbar bg-base-300">
-      <LoginModal></LoginModal>
-      <RegisterModal></RegisterModal>
-      <PostModal></PostModal>
       <div className="flex-1">
         <a className="btn btn-ghost text-xl" onClick={() => {props.viewFrom(0)}}>Social-Hub</a>
         <label className="swap swap-rotate">
@@ -58,12 +91,14 @@ export default function Header(props: HeaderProps) {
       </div>
       <div className="flex-none gap-2">
         {
-          user != null &&
-          (<button className="btn btn-outline btn-primary" onClick={onOpenPostModal}>New Post</button>)
+          NewPostButton()
         }
-        <div className="form-control">
-          <input type="text" placeholder="Search" className="input input-bordered w-24 md:w-auto" />
-        </div>
+        {
+          SearchBar()
+        }
+        {
+          UpdateButton()
+        }
         {
           user != null
           ? <div className="dropdown dropdown-end">
@@ -74,7 +109,7 @@ export default function Header(props: HeaderProps) {
             </label>
             <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
               <li>
-                <a className="justify-between">
+                <a className="justify-between" onClick={onProfile}>
                   Profile
                 </a>
               </li>
