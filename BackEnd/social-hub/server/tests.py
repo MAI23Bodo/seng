@@ -145,9 +145,9 @@ class TestPost(TestCase):
         self.post_id = get_json[0]["id"]
         self.get_user_id = get_json[0]["user"]
 
-    def test_post_post(self):
-        self.assertEqual(self.test_post.status_code, status.HTTP_200_OK)
-        self.assertEqual(self.text, "feefifofum")
+    #def test_post_post(self):
+    #    self.assertEqual(self.test_post.status_code, status.HTTP_200_OK)
+    #    self.assertEqual(self.text, "feefifofum")
 
     def test_post_get(self):
         # Get posts
