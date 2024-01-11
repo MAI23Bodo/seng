@@ -11,6 +11,7 @@ import os
 import pika
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
@@ -35,9 +36,8 @@ class LoginView(APIView):
 
 # /logout - put
 class LogoutView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
+    @authentication_classes([TokenAuthentication])
+    @permission_classes([IsAuthenticated])
     def put(self, request):
         # get the user associated with the token
         user = request.user 
@@ -58,10 +58,9 @@ class UsersView(APIView):
         user.save()
         return JsonResponse(UserSerializer(user).data, safe=False)
     
+    @authentication_classes([TokenAuthentication])
+    @permission_classes([IsAuthenticated])
     def get(self, request):
-        authentication_classes = [TokenAuthentication]
-        permission_classes = [IsAuthenticated]
-        
         # Get filter parameters from the request
         id = request.GET.get('id')
         username = request.GET.get('username')
@@ -87,13 +86,14 @@ class UsersView(APIView):
 
 # /users/<id> - get + patch + put + delete
 class UserDetailView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-    
+    @authentication_classes([TokenAuthentication])
+    @permission_classes([IsAuthenticated])
     def get(self, request, id):
         user = User.objects.get(pk=id)
         return JsonResponse(UserSerializer(user).data, safe=False)
 
+    @authentication_classes([TokenAuthentication])
+    @permission_classes([IsAuthenticated])
     def patch(self, request, id):
         user = User.objects.get(pk=id)
         data = json.loads(request.body)
@@ -113,6 +113,8 @@ class UserDetailView(APIView):
         user.save()
         return JsonResponse(UserSerializer(user).data, safe=False)
 
+    @authentication_classes([TokenAuthentication])
+    @permission_classes([IsAuthenticated])
     def put(self, request, id):
         user = User.objects.get(pk=id)
         data = json.loads(request.body)
@@ -127,6 +129,8 @@ class UserDetailView(APIView):
         user.save()
         return JsonResponse(UserSerializer(user).data, safe=False)
 
+    @authentication_classes([TokenAuthentication])
+    @permission_classes([IsAuthenticated])
     def delete(self, request, id):
         user = User.objects.get(pk=id)
         user.delete()
@@ -134,9 +138,6 @@ class UserDetailView(APIView):
 
 # /posts - get + post
 class PostsView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
     def get(self, request):
         # Get filter parameters from the request
         id = request.GET.get('id')
@@ -161,6 +162,8 @@ class PostsView(APIView):
         serialized_posts = PostSerializer(Post.objects.filter(**filter_params), many=True)
         return JsonResponse(serialized_posts.data, safe=False)
     
+    @authentication_classes([TokenAuthentication])
+    @permission_classes([IsAuthenticated])
     def post(self, request):
         user = request.POST.get('user')
         text = request.POST.get('text')
@@ -222,13 +225,14 @@ class PostsView(APIView):
     
 # /posts/<id> - get + patch + put + delete
 class PostDetailView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
+    @authentication_classes([TokenAuthentication])
+    @permission_classes([IsAuthenticated])
     def get(self, request, id):
         post = Post.objects.get(pk=id)
         return JsonResponse(PostSerializer(post).data, safe=False)
 
+    @authentication_classes([TokenAuthentication])
+    @permission_classes([IsAuthenticated])
     def patch(self, request, id):
         post = Post.objects.get(pk=id)
         data = json.loads(request.body)
@@ -241,6 +245,8 @@ class PostDetailView(APIView):
         post.save()
         return JsonResponse(PostSerializer(post).data, safe=False)
 
+    @authentication_classes([TokenAuthentication])
+    @permission_classes([IsAuthenticated])
     def put(self, request, id):
         post = Post.objects.get(pk=id)
         data = json.loads(request.body)
@@ -253,6 +259,8 @@ class PostDetailView(APIView):
         post.save()
         return JsonResponse(PostSerializer(post).data, safe=False)
 
+    @authentication_classes([TokenAuthentication])
+    @permission_classes([IsAuthenticated])
     def delete(self, request, id):
         post = Post.objects.get(pk=id)
         post.delete()
