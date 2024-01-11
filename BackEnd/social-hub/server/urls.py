@@ -10,7 +10,7 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name="logout"),
     path('users/', UsersView.as_view(), name='users'),
     path('users/<int:id>/', UserDetailView.as_view(), name='user_detail'),
-    path('posts/', (permission_classes([IsAuthenticated])(PostsView)).as_view(), name='posts'),
+    path('posts/', PostsView.as_view(), name='posts'),
     path('posts/<id>/', PostDetailView.as_view(), name='post_detail'),
     #for development only:
     path("admin/", admin.site.urls),

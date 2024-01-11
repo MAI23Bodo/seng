@@ -63,20 +63,27 @@ const PostsProvider: React.FC<PostsProviderProps> = ({ children }) => {
     })
   }
 
-  useEffect(() => {
-    if(!loaded) {
-      setLoaded(true)
-      getPosts().then(res => {
-        initial_posts = res;
-        setPosts(initial_posts)
-    
-      });
-    }
-    
-  })
+  const collectPosts = () => {
+    getPosts().then(res => {
+      initial_posts = res;
+      setPosts(res);
+    })
+  }
+
+  // useEffect(() => {
+  //   if(!loaded) {
+  //     setLoaded(true)
+  //     getPosts().then(res => {
+  //       initial_posts = res;
+  //       setPosts(initial_posts)
+  //   
+  //     });
+  //   }
+  //   
+  // })
 
   return (
-    <PostsContext.Provider value={{ posts, removePost, submitPost , changePost}}>
+    <PostsContext.Provider value={{ posts, removePost, submitPost , changePost, collectPosts}}>
       {children}
     </PostsContext.Provider>
   );

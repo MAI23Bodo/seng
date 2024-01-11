@@ -1,13 +1,7 @@
 from django.http import JsonResponse
-from django.views import View
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
-from django.core.serializers import serialize
+from django.contrib.auth import authenticate
 from server.serializers import UserSerializer, PostSerializer
 from django.utils import timezone
-from django.shortcuts import get_object_or_404, get_list_or_404
 import json
 import base64
 from PIL import Image
@@ -17,19 +11,17 @@ import os
 import pika
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
+from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.views import APIView
+from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 
 
 from django.contrib.auth.models import User
 from .models import Post
 
-# TODO: image endpoint/view + activate login_required
-
 # / - post
-class LoginView(View):
-    @method_decorator(csrf_exempt)
+class LoginView(APIView):
     def post(self, request):
         username = request.POST['username']
         password = request.POST['password']
@@ -37,22 +29,37 @@ class LoginView(View):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             token = Token.objects.create(user=user)
-            print(token.key)
+            print("Token key = ", token.key)
             return JsonResponse({"userId": user.id, 'token': str(token)})
         else:
-            return JsonResponse({"error": "Invalid credentials"})
+            return JsonResponse({"error": "Invalid credentials"}, status=401)
 
-# /logout - post
-class LogoutView(View):
-    @method_decorator(csrf_exempt)
-    @method_decorator(login_required())
-    def post(self, request):
-        logout(request)
-        return JsonResponse({"success": "Logged out successfully"})
+# /logout - put
+class LogoutView(APIView):
+    @authentication_classes([TokenAuthentication])
+    @permission_classes([IsAuthenticated])
+    def put(self, request):
+        # get the user associated with the token
+        user = request.user 
+
+        print("user who wants to logout: ", user)
+
+        # delete the token associated with the user
+        Token.objects.filter(user=user).delete()
+
+        return Response({"success": "Logged out successfully"})
 
 # /users - get + post
-class UsersView(View):
-    # @method_decorator(login_required())
+class UsersView(APIView):
+    def post(self, request):
+        user = User.objects.create_user(
+            username=request.POST.get('username'))
+        user.set_password(request.POST.get('password'))
+        user.save()
+        return JsonResponse(UserSerializer(user).data, safe=False)
+    
+    @authentication_classes([TokenAuthentication])
+    @permission_classes([IsAuthenticated])
     def get(self, request):
         # Get filter parameters from the request
         id = request.GET.get('id')
@@ -77,23 +84,16 @@ class UsersView(View):
         serialized_users = UserSerializer(User.objects.filter(**filter_params), many=True)
         return JsonResponse(serialized_users.data, safe=False)
 
-    @method_decorator(csrf_exempt)
-    def post(self, request):
-        user = User.objects.create_user(
-            username=request.POST.get('username'))
-        user.set_password(request.POST.get('password'))
-        user.save()
-        return JsonResponse(UserSerializer(user).data, safe=False)
-
 # /users/<id> - get + patch + put + delete
-class UserDetailView(View):
-    # @method_decorator(login_required())
+class UserDetailView(APIView):
+    @authentication_classes([TokenAuthentication])
+    @permission_classes([IsAuthenticated])
     def get(self, request, id):
         user = User.objects.get(pk=id)
         return JsonResponse(UserSerializer(user).data, safe=False)
 
-    @method_decorator(csrf_exempt)
-    #@method_decorator(login_required())
+    @authentication_classes([TokenAuthentication])
+    @permission_classes([IsAuthenticated])
     def patch(self, request, id):
         user = User.objects.get(pk=id)
         data = json.loads(request.body)
@@ -113,8 +113,8 @@ class UserDetailView(View):
         user.save()
         return JsonResponse(UserSerializer(user).data, safe=False)
 
-    @method_decorator(csrf_exempt)
-    #@method_decorator(login_required())
+    @authentication_classes([TokenAuthentication])
+    @permission_classes([IsAuthenticated])
     def put(self, request, id):
         user = User.objects.get(pk=id)
         data = json.loads(request.body)
@@ -129,17 +129,16 @@ class UserDetailView(View):
         user.save()
         return JsonResponse(UserSerializer(user).data, safe=False)
 
-    #@method_decorator(login_required())
+    @authentication_classes([TokenAuthentication])
+    @permission_classes([IsAuthenticated])
     def delete(self, request, id):
         user = User.objects.get(pk=id)
         user.delete()
         return JsonResponse({"success": "User deleted successfully"})
 
 # /posts - get + post
-class PostsView(View):
-    
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+class PostsView(APIView):
+
     def get(self, request):
         # Get filter parameters from the request
         id = request.GET.get('id')
@@ -164,8 +163,8 @@ class PostsView(View):
         serialized_posts = PostSerializer(Post.objects.filter(**filter_params), many=True)
         return JsonResponse(serialized_posts.data, safe=False)
     
-    @method_decorator(csrf_exempt)
-    #@method_decorator(login_required())
+    @authentication_classes([TokenAuthentication])
+    @permission_classes([IsAuthenticated])
     def post(self, request):
         user = request.POST.get('user')
         text = request.POST.get('text')
@@ -225,16 +224,16 @@ class PostsView(View):
         connection.close()
         return JsonResponse(PostSerializer(post).data, safe=False)
     
-
 # /posts/<id> - get + patch + put + delete
-class PostDetailView(View):
-    #@method_decorator(login_required())
+class PostDetailView(APIView):
+    @authentication_classes([TokenAuthentication])
+    @permission_classes([IsAuthenticated])
     def get(self, request, id):
         post = Post.objects.get(pk=id)
         return JsonResponse(PostSerializer(post).data, safe=False)
 
-    @method_decorator(csrf_exempt)
-    #@method_decorator(login_required())
+    @authentication_classes([TokenAuthentication])
+    @permission_classes([IsAuthenticated])
     def patch(self, request, id):
         post = Post.objects.get(pk=id)
         data = json.loads(request.body)
@@ -247,8 +246,8 @@ class PostDetailView(View):
         post.save()
         return JsonResponse(PostSerializer(post).data, safe=False)
 
-    @method_decorator(csrf_exempt)
-    #@method_decorator(login_required())
+    @authentication_classes([TokenAuthentication])
+    @permission_classes([IsAuthenticated])
     def put(self, request, id):
         post = Post.objects.get(pk=id)
         data = json.loads(request.body)
@@ -261,7 +260,8 @@ class PostDetailView(View):
         post.save()
         return JsonResponse(PostSerializer(post).data, safe=False)
 
-    #@method_decorator(login_required())
+    @authentication_classes([TokenAuthentication])
+    @permission_classes([IsAuthenticated])
     def delete(self, request, id):
         post = Post.objects.get(pk=id)
         post.delete()

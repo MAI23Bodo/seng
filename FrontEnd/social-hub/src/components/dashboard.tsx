@@ -6,24 +6,38 @@ import ProfilePage from "./profile-page";
 import PostModal from "./modals/post-modal";
 import RegisterModal from "./modals/register-modal";
 import LoginModal from "./modals/login-modal";
+import { HomePage } from "./home-page";
 
 export enum DisplayPage {
     Posts,
-    User
+    User,
+    Home
 }
 
 export default function Dashboard() {
     const [filterId, setFilterId] = useState(0);
+    const [search, setSearch] = useState<string | null>(null)
     const [displayPage, setDisplayPage] = useState(DisplayPage.Posts)
+    
 
     const postsContext = useContext(PostsContext);
-    if (!postsContext) return <p>No posts context available</p>;
+    if (!postsContext) return <p>No posts context available</p>
     
     const getDisplayPosts = () => {
-        if (filterId === 0) {
-            return postsContext.posts
+        let result  = postsContext.posts
+        if (filterId !== 0) {
+            result =  postsContext.posts.filter(p => p.user.id === filterId)
+        }        
+        if (search !== null) {
+            result = result.filter(p => p.text?.includes(search))
         }
-        return postsContext.posts.filter(p => p.user.id === filterId);
+        return result
+    }
+
+    const resetFilters = () => {
+        setFilterId(0)
+        setSearch(null)
+        setDisplayPage(DisplayPage.Posts)
     }
     
     const viewFrom = (id: number) => {
@@ -39,6 +53,8 @@ export default function Dashboard() {
                 return(<PostColumns posts={getDisplayPosts()} viewFrom={viewFrom}></PostColumns>)
             case DisplayPage.User:
                 return(<ProfilePage></ProfilePage>)
+            case DisplayPage.Home:
+                return(<HomePage></HomePage>)
         }
     }
 
@@ -47,7 +63,7 @@ export default function Dashboard() {
             <LoginModal></LoginModal>
             <RegisterModal></RegisterModal>
             <PostModal></PostModal>
-            <Header viewFrom={viewFrom} switchPage={setDisplayPage} displayPage={displayPage}></Header>
+            <Header resetFilters={resetFilters} switchPage={setDisplayPage} displayPage={displayPage} search={search} setSearch={setSearch}></Header>
             <main className="flex min-h-screen flex-col items-center justify-between p-24">
                {pageRouting()}
             </main>

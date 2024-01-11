@@ -12,6 +12,8 @@ Server:
     python -m pip install --upgrade pip
     pip install --upgrade django djangorestframework
     pip install --upgrade django-cors-headers
+    pip install Pillow
+    pip install pika
 
     - to start the server type in following command:
 
@@ -30,6 +32,7 @@ Client:
     - install dependencies (tested with Node 18.0.0 and npm 8.6.0):
 
     npm install axios
+    npm install next
 
     - to start the client, use following command:
 
