@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-Backend
-    command: sh ./BackEnd/social-hub/start.sh
+    command: sh start.sh
     volumes:
       - backend-vol:/code
     ports:
@@ -15,7 +15,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-Frontend
-    command:
     ports:
       - "3000:3000"
     depends_on:
