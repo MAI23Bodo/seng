@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-Backend
-    command: python manage.py runserver
+    command: sh ./start.sh
     volumes:
       - backend-vol:/code
     ports:
