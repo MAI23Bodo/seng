@@ -97,6 +97,7 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
             setUser(res)
         })
     }
+    
 
     return (
         <UserContext.Provider value={{ user, setUser, token, login, logout, register, editUser, findUser}}>

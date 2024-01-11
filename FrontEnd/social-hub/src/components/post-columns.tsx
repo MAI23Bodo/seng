@@ -19,9 +19,7 @@ export default function PostColumns(props: PostColumnsProps) {
   // const { user } = userContext;
   const {collectPosts} = postsContext;
 
-  useEffect(() => {
-    collectPosts()
-  })
+
 
   return(
     <div className="columns-3 ">
