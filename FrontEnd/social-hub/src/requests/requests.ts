@@ -17,7 +17,7 @@ export const useRequests = () => {
   const postLogin = async (credentials: Credentials) => {
     let response = await instance.postForm('/login/', credentials)
     if (response.status !== 200) {
-      console.warn('login failded')
+      console.warn('login failed')
     }
     return response.data
   }
