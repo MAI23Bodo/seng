@@ -138,6 +138,7 @@ class UserDetailView(APIView):
 
 # /posts - get + post
 class PostsView(APIView):
+
     def get(self, request):
         # Get filter parameters from the request
         id = request.GET.get('id')

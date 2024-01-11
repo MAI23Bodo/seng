@@ -6,10 +6,12 @@ import ProfilePage from "./profile-page";
 import PostModal from "./modals/post-modal";
 import RegisterModal from "./modals/register-modal";
 import LoginModal from "./modals/login-modal";
+import { HomePage } from "./home-page";
 
 export enum DisplayPage {
     Posts,
-    User
+    User,
+    Home
 }
 
 export default function Dashboard() {
@@ -51,6 +53,8 @@ export default function Dashboard() {
                 return(<PostColumns posts={getDisplayPosts()} viewFrom={viewFrom}></PostColumns>)
             case DisplayPage.User:
                 return(<ProfilePage></ProfilePage>)
+            case DisplayPage.Home:
+                return(<HomePage></HomePage>)
         }
     }
 

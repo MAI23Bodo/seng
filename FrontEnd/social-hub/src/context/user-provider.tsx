@@ -14,11 +14,13 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     const userStorageKey = 'social_hub_user'
 
     const try_finding_token = () => {
+        console.debug(localStorage.getItem(tokenStorageKey))
         return localStorage.getItem(tokenStorageKey)
     }
 
     const try_finding_user = () => {
         let foundValue = localStorage.getItem(userStorageKey)
+        console.debug(localStorage.getItem(userStorageKey))
         return foundValue != null ? JSON.parse(foundValue) : null
     }
 
@@ -34,11 +36,12 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         return postLogin(credentials).then(result => {
             if (result.userId) {
                 findUser(result.userId)
-                setUser({ username: credentials.username, email: null, id: result.userId, first_name: null, last_name: null, userIconUrl: '', password: null})
+                let userObject = { username: credentials.username, email: null, id: result.userId, first_name: null, last_name: null, userIconUrl: '', password: null}
+                setUser(userObject)
                 setToken(`Token ${result.token}`)
                 localStorage.setItem(tokenStorageKey, result.token)
-                localStorage.setItem(userStorageKey, JSON.stringify(user))
-                
+                localStorage.setItem(userStorageKey, JSON.stringify(userObject))
+                console.debug(JSON.stringify(userObject))
                 return true
             }
             else {

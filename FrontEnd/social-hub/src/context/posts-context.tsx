@@ -10,4 +10,5 @@ export interface PostsContextType {
     removePost: (id: number) => void
     submitPost: (post: Post) => void
     changePost: (id: string, text: string) => void
+    collectPosts: () => void
 }
