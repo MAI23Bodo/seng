@@ -1,0 +1,13 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY ./FrontEnd/social-hub/package.json .
+
+RUN npm install
+
+COPY ./FrontEnd/social-hub .
+
+EXPOSE 3000
+
+CMD ["npm", "run", "dev"]
