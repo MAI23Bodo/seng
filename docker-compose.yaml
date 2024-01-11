@@ -8,10 +8,6 @@ services:
       - backend-vol:/code
     ports:
       - "8000:8000"
-    environment:
-      - POSTGRES_NAME=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
     networks:
       - djangonetwork
 
@@ -24,6 +20,8 @@ services:
       - "3000:3000"
     depends_on:
       - backend
+    networks:
+      - djangonetwork
 
 networks:
   djangonetwork:
